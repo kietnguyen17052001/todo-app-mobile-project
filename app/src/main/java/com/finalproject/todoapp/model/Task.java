@@ -1,16 +1,26 @@
 package com.finalproject.todoapp.model;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 import java.sql.Timestamp;
 
 public class Task implements Serializable {
+    @SerializedName("id")
     private int id;
+    @SerializedName("name")
     private String name;
+    @SerializedName("description")
     private String description;
+    @SerializedName("categoryId")
     private int categoryId;
+    @SerializedName("newListId")
     private int newListId;
+    @SerializedName("createdAt")
     private Timestamp createdAt;
+    @SerializedName("updatedAt")
     private Timestamp updatedAt;
+    @SerializedName("completed")
     private boolean completed;
 
     public Task(int id, String name, String description, int categoryId, int newListId, Timestamp createdAt, Timestamp updatedAt, boolean completed) {
