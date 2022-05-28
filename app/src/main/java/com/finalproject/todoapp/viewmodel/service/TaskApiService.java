@@ -22,39 +22,39 @@ public class TaskApiService {
                 .build().create(TaskApi.class);
     }
 
-    Single<List<Task>> getMyDayTasks(int userId) {
+    public Single<List<Task>> getMyDayTasks(int userId) {
         return api.getMyDayTasks(userId);
     }
 
-    Single<List<Task>> getImportantTasks(int userId) {
+    public Single<List<Task>> getImportantTasks(int userId) {
         return api.getImportantTasks(userId);
     }
 
-    Single<List<Task>> getNewListTasks(int userId, int newListId) {
+    public Single<List<Task>> getNewListTasks(int userId, int newListId) {
         return api.getNewListTasks(userId, newListId);
     }
 
-    Single<Task> createMyDayTask(int userId, Task task) {
+    public Single<Task> createMyDayTask(int userId, Task task) {
         return api.createMyDayTask(userId, task);
     }
 
-    Single<Task> createImportantTask(int userId, Task task) {
+    public Single<Task> createImportantTask(int userId, Task task) {
         return api.createImportantTask(userId, task);
     }
 
-    Single<Task> createNewListTask(int userId, int newListId, Task task) {
+    public Single<Task> createNewListTask(int userId, int newListId, Task task) {
         return api.createNewListTask(userId, newListId, task);
     }
 
-    Single<Task> update(int userId, int taskId, Task task) {
+    public Single<Task> update(int userId, int taskId, Task task) {
         return api.update(userId, taskId, task);
     }
 
-    Single<Task> completed(int userId, int taskId) {
+    public Single<Task> completed(int userId, int taskId) {
         return api.completed(userId, taskId);
     }
 
-    void delete(int userId, int taskId) {
+    public void delete(int userId, int taskId) {
         api.delete(userId, taskId);
     }
 }
