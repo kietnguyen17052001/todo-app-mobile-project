@@ -25,6 +25,9 @@ public class User implements Serializable {
         this.updatedAt = updatedAt;
     }
 
+    public User() {
+    }
+
     public int getId() {
         return id;
     }

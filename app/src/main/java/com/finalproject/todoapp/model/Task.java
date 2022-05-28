@@ -34,6 +34,9 @@ public class Task implements Serializable {
         this.completed = completed;
     }
 
+    public Task() {
+    }
+
     public int getId() {
         return id;
     }

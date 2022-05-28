@@ -22,6 +22,9 @@ public class NewList implements Serializable {
         this.updatedAt = updatedAt;
     }
 
+    public NewList() {
+    }
+
     public int getId() {
         return id;
     }
