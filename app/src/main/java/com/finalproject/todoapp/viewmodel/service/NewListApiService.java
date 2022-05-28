@@ -1,9 +1,7 @@
 package com.finalproject.todoapp.viewmodel.service;
 
 import com.finalproject.todoapp.model.NewList;
-import com.finalproject.todoapp.model.User;
 import com.finalproject.todoapp.viewmodel.api.NewListApi;
-import com.finalproject.todoapp.viewmodel.api.UserApi;
 
 import java.util.List;
 
