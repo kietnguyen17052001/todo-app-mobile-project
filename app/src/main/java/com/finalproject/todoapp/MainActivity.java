@@ -24,8 +24,9 @@ import io.reactivex.rxjava3.observers.DisposableSingleObserver;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
-    private TaskApiService taskApiService;
-    private int userId = 1;
+    private UserApiService userApiService;
+    private String username = "kietdeptrai", password = "";
+    private int newListId = 4;
     private ActivityMainBinding binding;
 
     @Override
@@ -34,20 +35,20 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
-        taskApiService = new TaskApiService();
-        taskApiService.getMyDayTasks(userId)
+        userApiService = new UserApiService();
+        userApiService.getUserByUsernameAndPassword(username, password)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new SingleObserver<List<Task>>() {
+                .subscribeWith(new SingleObserver<User>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
 
                     }
 
                     @Override
-                    public void onSuccess(@NonNull List<Task> tasks) {
-                        for(Task task : tasks){
-                            Log.d("name", task.getName());
+                    public void onSuccess(@NonNull User user) {
+                        if (user != null){
+                            Log.d("name", user.getDisplayName());
                         }
                     }
 

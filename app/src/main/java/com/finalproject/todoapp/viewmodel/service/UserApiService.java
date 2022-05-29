@@ -20,6 +20,10 @@ public class UserApiService {
                 .build().create(UserApi.class);
     }
 
+    public Single<User> getUserByUsernameAndPassword(String username, String password) {
+        return api.getUserByUsernameAndPassword(username, password);
+    }
+
     public Single<User> getUserByEmail(String email) {
         return api.getUserByEmail(email);
     }

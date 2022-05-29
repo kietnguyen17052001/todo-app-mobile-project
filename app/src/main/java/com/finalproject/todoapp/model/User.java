@@ -12,15 +12,21 @@ public class User implements Serializable {
     private String displayName;
     @SerializedName("email")
     private String email;
+    @SerializedName("username")
+    private String username;
+    @SerializedName("password")
+    private String password;
     @SerializedName("createdAt")
     private Timestamp createdAt;
     @SerializedName("updatedAt")
     private Timestamp updatedAt;
 
-    public User(int id, String displayName, String email, Timestamp createdAt, Timestamp updatedAt) {
+    public User(int id, String displayName, String email, String username, String password, Timestamp createdAt, Timestamp updatedAt) {
         this.id = id;
         this.displayName = displayName;
         this.email = email;
+        this.username = username;
+        this.password = password;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -50,6 +56,22 @@ public class User implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Timestamp getCreatedAt() {
