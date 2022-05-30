@@ -1,10 +1,11 @@
-package com.finalproject.todoapp;
-
-import androidx.appcompat.app.AppCompatActivity;
+package com.finalproject.todoapp.view;
 
 import android.os.Bundle;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.finalproject.todoapp.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -33,5 +34,6 @@ public class Login extends AppCompatActivity {
             String accEmail = acct.getEmail();
             email.setText(accEmail);
         }
+
     }
 }

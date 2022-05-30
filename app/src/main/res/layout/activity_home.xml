@@ -6,24 +6,30 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    tools:context=".view.Login">
+    tools:context=".view.Home">
 
     <TextView
-        android:id="@+id/name"
+        android:id="@+id/name_home"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Name"
+        android:textStyle="bold"
         android:textSize="30dp"
-        android:gravity="center">
-    </TextView>
+        android:gravity="center"></TextView>
 
     <TextView
-        android:id="@+id/email"
+        android:id="@+id/email_home"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Email"
+        android:textStyle="bold"
         android:textSize="30dp"
-        android:gravity="center">
-    </TextView>
+        android:gravity="center"></TextView>
+
+    <Button
+        android:id="@+id/btn_logout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Logout"></Button>
 
 </LinearLayout>

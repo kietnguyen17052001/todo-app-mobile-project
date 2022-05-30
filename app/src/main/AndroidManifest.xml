@@ -3,7 +3,6 @@
     package="com.finalproject.todoapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -12,7 +11,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TodoApp">
         <activity
-            android:name=".Login"
+            android:name=".view.Home"
+            android:exported="false" />
+        <activity
+            android:name=".view.Register"
+            android:exported="false" />
+        <activity
+            android:name=".view.Login"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
