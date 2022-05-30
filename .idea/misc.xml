@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+<<<<<<< HEAD
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/todo-app-mobile-project/app/src/main/res/drawable/bg_btn.xml" value="0.132" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/todo-app-mobile-project/app/src/main/res/drawable/bg_btn_gg.xml" value="0.132" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/todo-app-mobile-project/app/src/main/res/drawable/border.xml" value="0.132" />
@@ -13,6 +14,9 @@
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/todo-app-mobile-project/app/src/main/res/drawable/ic_launcher_background.xml" value="0.132" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/todo-app-mobile-project/app/src/main/res/layout/activity_login.xml" value="0.25" />
         <entry key="..\:/Users/ADMIN/AndroidStudioProjects/todo-app-mobile-project/app/src/main/res/layout/activity_main.xml" value="0.20416666666666666" />
+=======
+        <entry key="..\:/Kiet/Mobile/Android/TodoApp/app/src/main/res/layout/activity_main.xml" value="0.14666666666666667" />
+>>>>>>> 202adbb893cd27a82b6a6e5ddd304347706deb54
       </map>
     </option>
   </component>
