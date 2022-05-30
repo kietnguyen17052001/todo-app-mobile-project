@@ -28,8 +28,8 @@ public class UserApiService {
         return api.getUserByEmail(email);
     }
 
-    public Single<User> create(User user) {
-        return api.create(user);
+    public Single<User> create(User user, int loginTypeId) {
+        return api.create(user, loginTypeId);
     }
 
     public Single<User> update(int id, User user) {
