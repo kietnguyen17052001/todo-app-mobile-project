@@ -49,4 +49,8 @@ dependencies {
     implementation "com.github.akarnokd:rxjava3-retrofit-adapter:3.0.0"
 
     implementation 'com.squareup.picasso:picasso:2.71828'
+
+    implementation 'com.google.android.gms:play-services-auth:20.2.0'
 }
+
+apply plugin: 'com.android.application'
