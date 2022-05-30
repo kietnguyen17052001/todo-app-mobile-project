@@ -18,7 +18,7 @@ public interface UserApi {
     Single<User> getUserByEmail(@Path("email") String email);
 
     @POST("api/users")
-    Single<User> create(@Body User user);
+    Single<User> create(@Body User user, @Query("loginType") int loginTypeId);
 
     @PUT("api/users/{id}")
     Single<User> update(@Path("id") int id, @Body User user);
