@@ -5,15 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Patterns;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
 
 import com.finalproject.todoapp.databinding.ActivityMainBinding;
 import com.finalproject.todoapp.view.Home;
-import com.finalproject.todoapp.view.Login;
 import com.finalproject.todoapp.view.Register;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -23,22 +18,15 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
 import android.util.Log;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.finalproject.todoapp.model.User;
-import com.finalproject.todoapp.viewmodel.service.TaskApiService;
 import com.finalproject.todoapp.viewmodel.service.UserApiService;
-
-import java.io.Serializable;
-import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.SingleObserver;
 import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.observers.DisposableSingleObserver;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity{
