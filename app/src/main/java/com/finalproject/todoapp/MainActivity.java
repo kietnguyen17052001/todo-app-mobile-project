@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity{
         View view = binding.getRoot();
         setContentView(view);
         userApiService = new UserApiService();
+        user = new User();
 
         binding.btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,6 +122,27 @@ public class MainActivity extends AppCompatActivity{
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 task.getResult(ApiException.class);
+                user.setEmail(task.getResult(ApiException.class).getEmail().toString());
+                user.setDisplayName(task.getResult(ApiException.class).getDisplayName().toString());
+                userApiService.create(user, 1)
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeWith(new SingleObserver<User>() {
+                            @Override
+                            public void onSubscribe(@NonNull Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onSuccess(@NonNull User user) {
+                                Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_LONG).show();
+                            }
+                            @Override
+                            public void onError(@NonNull Throwable e) {
+                                Log.d("ERROR: ", e.getMessage());
+                                Toast.makeText(MainActivity.this, "Fail", Toast.LENGTH_LONG).show();
+                            }
+                        });
                 toHome();
             } catch (ApiException e) {
                 e.printStackTrace();

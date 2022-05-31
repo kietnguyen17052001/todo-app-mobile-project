@@ -61,7 +61,7 @@ public class Register extends AppCompatActivity {
                         user.setDisplayName(displayName);
                         user.setEmail(email);
 
-                        userApiService.create(user)
+                        userApiService.create(user, 2)
                                 .subscribeOn(Schedulers.newThread())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribeWith(new SingleObserver<User>() {
