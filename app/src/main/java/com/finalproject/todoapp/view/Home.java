@@ -25,9 +25,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 
 public class Home extends AppCompatActivity {
     private ActivityHomeBinding binding;
-    User user;
-    GoogleSignInOptions gso;
-    GoogleSignInClient gsc;
+    private static final int GOOGLE = 1, ACCOUNT = 2;
+    private User user;
+    private GoogleSignInOptions gso;
+    private GoogleSignInClient gsc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,11 +39,15 @@ public class Home extends AppCompatActivity {
 
         Intent intent = getIntent();
         Integer status = intent.getIntExtra("status", 0);
-        if(status == 1) {
-            if(intent!=null){
+        if (status == ACCOUNT) {
+            if (intent != null) {
                 user = (User) intent.getSerializableExtra("user");
                 binding.nameHome.setText(user.getDisplayName().toString());
-                binding.emailHome.setText(user.getEmail().toString());
+                if (user.getEmail() != null) {
+                    binding.emailHome.setText(user.getEmail().toString());
+                } else {
+                    binding.emailHome.setText("k co email");
+                }
                 binding.btnLogout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -59,7 +64,7 @@ public class Home extends AppCompatActivity {
 
             GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
 
-            if(acct!=null) {
+            if (acct != null) {
                 String name = acct.getDisplayName();
                 String email = acct.getEmail();
                 binding.nameHome.setText(name);

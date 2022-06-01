@@ -29,10 +29,10 @@ import io.reactivex.rxjava3.core.SingleObserver;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
     private UserApiService userApiService;
     private User user;
-    private final int GOOGLE = 1;
+    private static final int GOOGLE = 1, ACCOUNT = 2;
     private String username, password;
     private int newListId = 4;
     private ActivityMainBinding binding;
@@ -46,14 +46,11 @@ public class MainActivity extends AppCompatActivity{
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
-<<<<<<< HEAD
-=======
 
         getSupportActionBar().hide();
 
         user = new User();
 
->>>>>>> 2ea03c2 (create account by Google)
         userApiService = new UserApiService();
 
         binding.btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -63,7 +60,7 @@ public class MainActivity extends AppCompatActivity{
                 username = binding.username.getText().toString();
                 password = binding.password.getText().toString();
 
-                if (username.length() == 0 || password.length() == 0){
+                if (username.length() == 0 || password.length() == 0) {
                     Toast.makeText(MainActivity.this, "Please enter your username or password", Toast.LENGTH_LONG).show();
 
                 } else {
@@ -78,13 +75,14 @@ public class MainActivity extends AppCompatActivity{
 
                                 @Override
                                 public void onSuccess(@NonNull User user) {
-                                    if (user != null){
+                                    if (user != null) {
                                         Intent intent = new Intent(MainActivity.this, Home.class);
                                         intent.putExtra("user", user);
-                                        intent.putExtra("status", 1);
+                                        intent.putExtra("status", ACCOUNT);
                                         startActivity(intent);
                                     }
                                 }
+
                                 @Override
                                 public void onError(@NonNull Throwable e) {
                                     Log.d("ERROR: ", e.getMessage());
@@ -113,7 +111,6 @@ public class MainActivity extends AppCompatActivity{
                 signIn();
             }
         });
-
 
 
     }
@@ -147,6 +144,7 @@ public class MainActivity extends AppCompatActivity{
                             public void onSuccess(@NonNull User user) {
                                 Toast.makeText(MainActivity.this, "Tạo mới thành công", Toast.LENGTH_LONG).show();
                             }
+
                             @Override
                             public void onError(@NonNull Throwable e) {
                                 Log.d("ERROR: ", e.getMessage());
@@ -163,11 +161,7 @@ public class MainActivity extends AppCompatActivity{
     void toHome() {
         finish();
         Intent intent = new Intent(MainActivity.this, Home.class);
-<<<<<<< HEAD
-        intent.putExtra("status", 2);
-=======
         intent.putExtra("status", GOOGLE);
->>>>>>> 2ea03c2 (create account by Google)
         startActivity(intent);
     }
 }

@@ -29,15 +29,12 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class Register extends AppCompatActivity {
-
-    private final int ACCOUNT = 2;
-
     private UserApiService userApiService;
     private ActivityRegisterBinding binding;
-    private static final int MY_PERMISSION_REQUEST_CODE_SEND_SMS = 1;
+    private static final int MY_PERMISSION_REQUEST_CODE_SEND_SMS = 1, ACCOUNT = 2;
     private static final String LOG_TAG = "SendOtpRegister";
-    User user;
-    String username, password, confirmPassword ,displayName, email;
+    private User user;
+    private String username, password, confirmPassword ,displayName, email;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +43,6 @@ public class Register extends AppCompatActivity {
         setContentView(view);
         user = new User();
         userApiService = new UserApiService();
-
         binding.btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -54,20 +50,13 @@ public class Register extends AppCompatActivity {
                 password = binding.passwordRegister.getText().toString();
                 confirmPassword = binding.confirmPasswordRegister.getText().toString();
                 displayName = binding.displaynameRegister.getText().toString();
-                email = binding.emailRegister.getText().toString();
 
-                if (checkEmpty(username) && checkEmpty(password) && checkEmpty(confirmPassword) && checkEmpty(email) && checkEmpty(displayName)){
+                if (checkEmpty(username) && checkEmpty(password) && checkEmpty(confirmPassword) && checkEmpty(displayName)){
                     if (password.equals(confirmPassword)) {
                         user.setUsername(username);
                         user.setPassword(password);
                         user.setDisplayName(displayName);
-                        user.setEmail(email);
-
-<<<<<<< HEAD
-                        userApiService.create(user)
-=======
                         userApiService.create(user, ACCOUNT)
->>>>>>> 2ea03c2 (create account by Google)
                                 .subscribeOn(Schedulers.newThread())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribeWith(new SingleObserver<User>() {
