@@ -32,7 +32,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class MainActivity extends AppCompatActivity {
     private UserApiService userApiService;
     private User user;
-    private static final int GOOGLE = 1, ACCOUNT = 2;
+    private static final int GOOGLE = 1, ACCOUNT = 2, FACEBOOK = 4;
     private String username, password;
     private int newListId = 4;
     private ActivityMainBinding binding;
@@ -52,13 +52,10 @@ public class MainActivity extends AppCompatActivity {
         binding.btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 username = binding.username.getText().toString();
                 password = binding.password.getText().toString();
-
                 if (username.length() == 0 || password.length() == 0) {
                     Toast.makeText(MainActivity.this, "Please enter your username or password", Toast.LENGTH_LONG).show();
-
                 } else {
                     userApiService.getUserByUsernameAndPassword(username, password)
                             .subscribeOn(Schedulers.newThread())
@@ -137,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
                         .subscribeWith(new SingleObserver<User>() {
                             @Override
                             public void onSubscribe(@NonNull Disposable d) {
-
                             }
 
                             @Override

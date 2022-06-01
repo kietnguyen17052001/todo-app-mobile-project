@@ -14,7 +14,10 @@ public interface UserApi {
     @GET("api/users")
     Single<User> getUserByUsernameAndPassword(@Query("username") String username, @Query("password") String password);
 
-    @GET("api/users/{email}")
+    @GET("api/users/uid/{uid}")
+    Single<User> getUserByUid(@Path("uid") String uid);
+
+    @GET("api/users/email/{email}")
     Single<User> getUserByEmail(@Path("email") String email);
 
     @POST("api/users")
