@@ -21,11 +21,17 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class Register extends AppCompatActivity {
-
     private UserApiService userApiService;
     private ActivityRegisterBinding binding;
+<<<<<<< HEAD
     User user;
     String username, password, confirmPassword ,displayName;
+=======
+    private static final int MY_PERMISSION_REQUEST_CODE_SEND_SMS = 1, ACCOUNT = 2;
+    private static final String LOG_TAG = "SendOtpRegister";
+    private User user;
+    private String username, password, confirmPassword ,displayName, email;
+>>>>>>> cc5768bd933362bccddcfd84cf24b9ac959d404b
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +43,6 @@ public class Register extends AppCompatActivity {
 
         user = new User();
         userApiService = new UserApiService();
-
         binding.btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -51,8 +56,12 @@ public class Register extends AppCompatActivity {
                         user.setUsername(username);
                         user.setPassword(password);
                         user.setDisplayName(displayName);
+<<<<<<< HEAD
 
                         userApiService.create(user, 2)
+=======
+                        userApiService.create(user, ACCOUNT)
+>>>>>>> cc5768bd933362bccddcfd84cf24b9ac959d404b
                                 .subscribeOn(Schedulers.newThread())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribeWith(new SingleObserver<User>() {

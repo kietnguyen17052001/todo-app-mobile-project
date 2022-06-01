@@ -18,9 +18,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 
 public class Home extends AppCompatActivity {
     private ActivityHomeBinding binding;
-    User user;
-    GoogleSignInOptions gso;
-    GoogleSignInClient gsc;
+    private static final int GOOGLE = 1, ACCOUNT = 2;
+    private User user;
+    private GoogleSignInOptions gso;
+    private GoogleSignInClient gsc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +34,13 @@ public class Home extends AppCompatActivity {
 
         Intent intent = getIntent();
         Integer status = intent.getIntExtra("status", 0);
+<<<<<<< HEAD
         if(status == 2) {
             if(intent!=null){
+=======
+        if (status == ACCOUNT) {
+            if (intent != null) {
+>>>>>>> cc5768bd933362bccddcfd84cf24b9ac959d404b
                 user = (User) intent.getSerializableExtra("user");
                 binding.nameHome.setText(user.getDisplayName().toString());
                 if (user.getEmail() != null) {
@@ -58,7 +64,7 @@ public class Home extends AppCompatActivity {
 
             GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
 
-            if(acct!=null) {
+            if (acct != null) {
                 String name = acct.getDisplayName();
                 String email = acct.getEmail();
                 binding.nameHome.setText(name);

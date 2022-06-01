@@ -29,9 +29,10 @@ import io.reactivex.rxjava3.core.SingleObserver;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
     private UserApiService userApiService;
     private User user;
+    private static final int GOOGLE = 1, ACCOUNT = 2;
     private String username, password;
     private int newListId = 4;
     private ActivityMainBinding binding;
@@ -48,6 +49,11 @@ public class MainActivity extends AppCompatActivity{
 
         getSupportActionBar().hide();
 
+<<<<<<< HEAD
+=======
+        user = new User();
+
+>>>>>>> cc5768bd933362bccddcfd84cf24b9ac959d404b
         userApiService = new UserApiService();
 
         binding.btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -57,7 +63,7 @@ public class MainActivity extends AppCompatActivity{
                 username = binding.username.getText().toString();
                 password = binding.password.getText().toString();
 
-                if (username.length() == 0 || password.length() == 0){
+                if (username.length() == 0 || password.length() == 0) {
                     Toast.makeText(MainActivity.this, "Please enter your username or password", Toast.LENGTH_LONG).show();
 
                 } else {
@@ -72,13 +78,18 @@ public class MainActivity extends AppCompatActivity{
 
                                 @Override
                                 public void onSuccess(@NonNull User user) {
-                                    if (user != null){
+                                    if (user != null) {
                                         Intent intent = new Intent(MainActivity.this, Home.class);
                                         intent.putExtra("user", user);
+<<<<<<< HEAD
                                         intent.putExtra("status", 2);
+=======
+                                        intent.putExtra("status", ACCOUNT);
+>>>>>>> cc5768bd933362bccddcfd84cf24b9ac959d404b
                                         startActivity(intent);
                                     }
                                 }
+
                                 @Override
                                 public void onError(@NonNull Throwable e) {
                                     Log.d("ERROR: ", e.getMessage());
@@ -112,9 +123,12 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View view) {
 
+<<<<<<< HEAD
             }
 
         });
+=======
+>>>>>>> cc5768bd933362bccddcfd84cf24b9ac959d404b
     }
 
     void signIn() {
@@ -129,6 +143,30 @@ public class MainActivity extends AppCompatActivity{
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 task.getResult(ApiException.class);
+                String email = task.getResult(ApiException.class).getEmail().toString();
+                String name = task.getResult(ApiException.class).getDisplayName().toString();
+                user.setEmail(email);
+                user.setDisplayName(name);
+                userApiService.create(user, GOOGLE)
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeWith(new SingleObserver<User>() {
+                            @Override
+                            public void onSubscribe(@NonNull Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onSuccess(@NonNull User user) {
+                                Toast.makeText(MainActivity.this, "Tạo mới thành công", Toast.LENGTH_LONG).show();
+                            }
+
+                            @Override
+                            public void onError(@NonNull Throwable e) {
+                                Log.d("ERROR: ", e.getMessage());
+                                Toast.makeText(MainActivity.this, "Đã có tài khoản", Toast.LENGTH_LONG).show();
+                            }
+                        });
                 toHome();
 
             } catch (ApiException e) {
@@ -139,7 +177,11 @@ public class MainActivity extends AppCompatActivity{
     void toHome() {
         finish();
         Intent intent = new Intent(MainActivity.this, Home.class);
+<<<<<<< HEAD
         intent.putExtra("status", 1);
+=======
+        intent.putExtra("status", GOOGLE);
+>>>>>>> cc5768bd933362bccddcfd84cf24b9ac959d404b
         startActivity(intent);
     }
 }
