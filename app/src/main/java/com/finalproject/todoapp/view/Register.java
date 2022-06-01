@@ -30,6 +30,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class Register extends AppCompatActivity {
 
+    private final int ACCOUNT = 2;
+
     private UserApiService userApiService;
     private ActivityRegisterBinding binding;
     private static final int MY_PERMISSION_REQUEST_CODE_SEND_SMS = 1;
@@ -61,7 +63,11 @@ public class Register extends AppCompatActivity {
                         user.setDisplayName(displayName);
                         user.setEmail(email);
 
+<<<<<<< HEAD
                         userApiService.create(user)
+=======
+                        userApiService.create(user, ACCOUNT)
+>>>>>>> 2ea03c2 (create account by Google)
                                 .subscribeOn(Schedulers.newThread())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribeWith(new SingleObserver<User>() {
