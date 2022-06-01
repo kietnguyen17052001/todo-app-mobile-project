@@ -9,6 +9,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.LoginManager;
 import com.finalproject.todoapp.MainActivity;
 import com.finalproject.todoapp.databinding.ActivityHomeBinding;
 import com.finalproject.todoapp.databinding.ActivityRegisterBinding;
@@ -23,6 +27,9 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class Home extends AppCompatActivity {
     private ActivityHomeBinding binding;
     User user;
@@ -36,9 +43,11 @@ public class Home extends AppCompatActivity {
         View view = binding.getRoot();
         setContentView(view);
 
+
+
         Intent intent = getIntent();
         Integer status = intent.getIntExtra("status", 0);
-        if(status == 1) {
+        if(status == 2) {
             if(intent!=null){
                 user = (User) intent.getSerializableExtra("user");
                 binding.nameHome.setText(user.getDisplayName().toString());
@@ -53,7 +62,7 @@ public class Home extends AppCompatActivity {
                     }
                 });
             }
-        } else {
+        } else if (status == 1){
             gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
             gsc = GoogleSignIn.getClient(this, gso);
 
@@ -77,6 +86,41 @@ public class Home extends AppCompatActivity {
                     }
                 });
             }
+        } else {
+
+            AccessToken accessToken = AccessToken.getCurrentAccessToken();
+
+            GraphRequest request = GraphRequest.newMeRequest(
+                    accessToken,
+                    new GraphRequest.GraphJSONObjectCallback() {
+                        @Override
+                        public void onCompleted(
+                                JSONObject object,
+                                GraphResponse response) {
+                            // Application code
+                            try {
+                                String name = object.getString("name");
+                                binding.nameHome.setText(name);
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+            Bundle parameters = new Bundle();
+            parameters.putString("fields", "name");
+            request.setParameters(parameters);
+            request.executeAsync();
+
+
+            binding.btnLogout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    LoginManager.getInstance().logOut();
+                    startActivity(new Intent(Home.this, MainActivity.class));
+                    finish();
+                }
+            });
         }
 
 

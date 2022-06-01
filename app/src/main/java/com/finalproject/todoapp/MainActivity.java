@@ -7,6 +7,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.finalproject.todoapp.databinding.ActivityMainBinding;
 import com.finalproject.todoapp.view.Home;
 import com.finalproject.todoapp.view.Register;
@@ -23,6 +30,8 @@ import android.widget.Toast;
 import com.finalproject.todoapp.model.User;
 import com.finalproject.todoapp.viewmodel.service.UserApiService;
 
+import java.util.Arrays;
+
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.SingleObserver;
@@ -38,6 +47,7 @@ public class MainActivity extends AppCompatActivity{
 
     GoogleSignInOptions gso;
     GoogleSignInClient gsc;
+    CallbackManager callbackManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +55,37 @@ public class MainActivity extends AppCompatActivity{
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
+
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(this);
+
+        callbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().registerCallback(callbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        Intent intent = new Intent(MainActivity.this, Home.class);
+                        intent.putExtra("status", 3);
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        // App code
+                        Log.d("Cancel", "Cancel");
+
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception) {
+                        Log.d("ERROR", exception.getStackTrace().toString());
+
+                    }
+                });
+
+
+
         userApiService = new UserApiService();
-        user = new User();
 
         binding.btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,7 +112,7 @@ public class MainActivity extends AppCompatActivity{
                                     if (user != null){
                                         Intent intent = new Intent(MainActivity.this, Home.class);
                                         intent.putExtra("user", user);
-                                        intent.putExtra("status", 1);
+                                        intent.putExtra("status", 2);
                                         startActivity(intent);
                                     }
                                 }
@@ -106,8 +145,14 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
+        binding.btnFb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, Arrays.asList("public_profile"));
 
+            }
 
+        });
     }
 
     void signIn() {
@@ -122,38 +167,30 @@ public class MainActivity extends AppCompatActivity{
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 task.getResult(ApiException.class);
-                user.setEmail(task.getResult(ApiException.class).getEmail().toString());
-                user.setDisplayName(task.getResult(ApiException.class).getDisplayName().toString());
-                userApiService.create(user, 1)
-                        .subscribeOn(Schedulers.newThread())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeWith(new SingleObserver<User>() {
-                            @Override
-                            public void onSubscribe(@NonNull Disposable d) {
-
-                            }
-
-                            @Override
-                            public void onSuccess(@NonNull User user) {
-                                Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_LONG).show();
-                            }
-                            @Override
-                            public void onError(@NonNull Throwable e) {
-                                Log.d("ERROR: ", e.getMessage());
-                                Toast.makeText(MainActivity.this, "Fail", Toast.LENGTH_LONG).show();
-                            }
-                        });
                 toHome();
+
             } catch (ApiException e) {
                 e.printStackTrace();
             }
+        } else {
+            callbackManager.onActivityResult(requestCode, resultCode, data);
         }
+
     }
 
     void toHome() {
         finish();
         Intent intent = new Intent(MainActivity.this, Home.class);
-        intent.putExtra("status", 2);
+        intent.putExtra("status", 1);
         startActivity(intent);
     }
+
+    void toHomeByFb() {
+        finish();
+        Intent intent = new Intent(MainActivity.this, Home.class);
+        intent.putExtra("status", 3);
+        startActivity(intent);
+    }
+
+
 }
