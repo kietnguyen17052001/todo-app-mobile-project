@@ -36,10 +36,10 @@ import io.reactivex.rxjava3.core.SingleObserver;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
     private UserApiService userApiService;
     private User user;
-    private final int GOOGLE = 1, FACEBOOK = 3;
+    private static final int GOOGLE = 1, ACCOUNT = 2, FACEBOOK = 4;
     private String username, password;
     private int newListId = 4;
     private ActivityMainBinding binding;
@@ -54,23 +54,18 @@ public class MainActivity extends AppCompatActivity{
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
-
         getSupportActionBar().hide();
 
         user = new User();
 
         userApiService = new UserApiService();
-
         binding.btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 username = binding.username.getText().toString();
                 password = binding.password.getText().toString();
-
-                if (username.length() == 0 || password.length() == 0){
+                if (username.length() == 0 || password.length() == 0) {
                     Toast.makeText(MainActivity.this, "Please enter your username or password", Toast.LENGTH_LONG).show();
-
                 } else {
                     userApiService.getUserByUsernameAndPassword(username, password)
                             .subscribeOn(Schedulers.newThread())
@@ -83,13 +78,14 @@ public class MainActivity extends AppCompatActivity{
 
                                 @Override
                                 public void onSuccess(@NonNull User user) {
-                                    if (user != null){
+                                    if (user != null) {
                                         Intent intent = new Intent(MainActivity.this, Home.class);
                                         intent.putExtra("user", user);
-                                        intent.putExtra("status", 2);
+                                        intent.putExtra("status", ACCOUNT);
                                         startActivity(intent);
                                     }
                                 }
+
                                 @Override
                                 public void onError(@NonNull Throwable e) {
                                     Log.d("ERROR: ", e.getMessage());
@@ -135,6 +131,7 @@ public class MainActivity extends AppCompatActivity{
                     @Override
                     public void onCancel() {
                         // App code
+
                     }
 
                     @Override
@@ -148,7 +145,6 @@ public class MainActivity extends AppCompatActivity{
             public void onClick(View view) {
                 LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, Arrays.asList("public_profile"));
             }
-
         });
     }
 
@@ -174,13 +170,13 @@ public class MainActivity extends AppCompatActivity{
                         .subscribeWith(new SingleObserver<User>() {
                             @Override
                             public void onSubscribe(@NonNull Disposable d) {
-
                             }
 
                             @Override
                             public void onSuccess(@NonNull User user) {
                                 Toast.makeText(MainActivity.this, "Tạo mới thành công", Toast.LENGTH_LONG).show();
                             }
+
                             @Override
                             public void onError(@NonNull Throwable e) {
                                 Log.d("ERROR: ", e.getMessage());
@@ -196,6 +192,7 @@ public class MainActivity extends AppCompatActivity{
             callbackManager.onActivityResult(requestCode, resultCode, data);
         }
     }
+
     void toHome() {
         finish();
         Intent intent = new Intent(MainActivity.this, Home.class);

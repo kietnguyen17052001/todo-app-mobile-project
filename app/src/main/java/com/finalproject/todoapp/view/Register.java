@@ -22,12 +22,13 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class Register extends AppCompatActivity {
 
-    private final int ACCOUNT = 2;
 
     private UserApiService userApiService;
     private ActivityRegisterBinding binding;
-    User user;
-    String username, password, confirmPassword ,displayName;
+    private static final int  ACCOUNT = 2;
+    private static final String LOG_TAG = "SendOtpRegister";
+    private User user;
+    private String username, password, confirmPassword ,displayName, email;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +40,6 @@ public class Register extends AppCompatActivity {
 
         user = new User();
         userApiService = new UserApiService();
-
         binding.btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

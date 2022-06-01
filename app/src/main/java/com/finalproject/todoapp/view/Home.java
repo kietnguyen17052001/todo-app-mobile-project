@@ -1,10 +1,10 @@
 package com.finalproject.todoapp.view;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -15,6 +15,7 @@ import com.facebook.login.LoginManager;
 import com.finalproject.todoapp.MainActivity;
 import com.finalproject.todoapp.databinding.ActivityHomeBinding;
 import com.finalproject.todoapp.model.User;
+import com.finalproject.todoapp.viewmodel.service.UserApiService;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -24,12 +25,21 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.SingleObserver;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+
 public class Home extends AppCompatActivity {
     private ActivityHomeBinding binding;
-    User user;
-    GoogleSignInOptions gso;
-    GoogleSignInClient gsc;
-    private final int ACCOUNT = 2, GOOGLE = 1, FACEBOOK = 3;
+
+    private static final int GOOGLE = 1, ACCOUNT = 2, FACEBOOK = 4;
+    private User user;
+    private GoogleSignInOptions gso;
+    private GoogleSignInClient gsc;
+
+    private UserApiService userApiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,12 +48,13 @@ public class Home extends AppCompatActivity {
         View view = binding.getRoot();
         setContentView(view);
 
-
+        userApiService = new UserApiService();
+        user = new User();
 
         Intent intent = getIntent();
         Integer status = intent.getIntExtra("status", 0);
-        if(status == ACCOUNT) {
-            if(intent!=null){
+        if (status == ACCOUNT) {
+            if (intent != null) {
                 user = (User) intent.getSerializableExtra("user");
                 binding.nameHome.setText(user.getDisplayName().toString());
                 binding.btnLogout.setOnClickListener(new View.OnClickListener() {
@@ -62,7 +73,7 @@ public class Home extends AppCompatActivity {
 
             GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
 
-            if(acct!=null) {
+            if (acct != null) {
                 String name = acct.getDisplayName();
                 binding.nameHome.setText(name);
                 String url = acct.getPhotoUrl().toString();
@@ -97,6 +108,28 @@ public class Home extends AppCompatActivity {
                                 String id = object.getString("id");
                                 String url = object.getJSONObject("picture").getJSONObject("data").getString("url");
                                 Picasso.get().load(url).into(binding.avatarHome);
+
+                                user.setUsername(id);
+                                user.setDisplayName(name);
+
+                                userApiService.create(user, FACEBOOK)
+                                        .subscribeOn(Schedulers.newThread())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribeWith(new SingleObserver<User>() {
+                                            @Override
+                                            public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+
+                                            }
+
+                                            @Override
+                                            public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull User user) {
+                                                Toast.makeText(Home.this, "Success", Toast.LENGTH_LONG).show();
+                                            }
+                                            @Override
+                                            public void onError(@NonNull Throwable e) {
+                                                Toast.makeText(Home.this, "Fail", Toast.LENGTH_LONG).show();
+                                            }
+                                        });
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
