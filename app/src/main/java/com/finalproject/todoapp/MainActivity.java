@@ -7,6 +7,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.finalproject.todoapp.databinding.ActivityMainBinding;
 import com.finalproject.todoapp.view.Home;
 import com.finalproject.todoapp.view.Register;
@@ -23,6 +28,8 @@ import android.widget.Toast;
 import com.finalproject.todoapp.model.User;
 import com.finalproject.todoapp.viewmodel.service.UserApiService;
 
+import java.util.Arrays;
+
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.SingleObserver;
@@ -32,10 +39,11 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class MainActivity extends AppCompatActivity{
     private UserApiService userApiService;
     private User user;
-    private final int GOOGLE = 1;
+    private final int GOOGLE = 1, FACEBOOK = 3;
     private String username, password;
     private int newListId = 4;
     private ActivityMainBinding binding;
+    private CallbackManager callbackManager;
 
     GoogleSignInOptions gso;
     GoogleSignInClient gsc;
@@ -111,10 +119,34 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
+        callbackManager = CallbackManager.Factory.create();
+
+        LoginManager.getInstance().registerCallback(callbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        // App code
+                        Intent intent = new Intent(MainActivity.this, Home.class);
+                        intent.putExtra("status", FACEBOOK);
+                        startActivity(intent);
+                        finish();
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        // App code
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception) {
+                        // App code
+                    }
+                });
+
         binding.btnFb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, Arrays.asList("public_profile"));
             }
 
         });
@@ -160,6 +192,8 @@ public class MainActivity extends AppCompatActivity{
             } catch (ApiException e) {
                 e.printStackTrace();
             }
+        } else {
+            callbackManager.onActivityResult(requestCode, resultCode, data);
         }
     }
     void toHome() {
