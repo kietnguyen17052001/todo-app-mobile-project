@@ -5,14 +5,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
     android:background="@drawable/background"
     tools:context=".view.Register">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="120dp"
+            android:layout_height="100dp"
+            android:background="@drawable/icon_todolist"></View>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/font"
+            android:gravity="center"
+            android:paddingTop="8dp"
+            android:text="To Do List"
+            android:textColor="@color/black"
+            android:textSize="50dp"
+            android:textStyle="bold"></TextView>
+    </LinearLayout>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="60dp"
+        android:textSize="40dp"
         android:text="Register"
         android:textColor="@color/black"
         android:fontFamily="@font/font"
@@ -67,21 +88,6 @@
         android:layout_marginRight="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="10dp"></EditText>
-
-
-    <EditText
-        android:id="@+id/email_register"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Email"
-        android:textSize="16dp"
-        android:background="@drawable/border_radius"
-        android:padding="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="10dp"></EditText>
-
-
 
     <Button
         android:id="@+id/btn_register"

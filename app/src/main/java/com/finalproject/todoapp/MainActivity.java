@@ -45,8 +45,10 @@ public class MainActivity extends AppCompatActivity{
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
+
+        getSupportActionBar().hide();
+
         userApiService = new UserApiService();
-        user = new User();
 
         binding.btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,7 +75,7 @@ public class MainActivity extends AppCompatActivity{
                                     if (user != null){
                                         Intent intent = new Intent(MainActivity.this, Home.class);
                                         intent.putExtra("user", user);
-                                        intent.putExtra("status", 1);
+                                        intent.putExtra("status", 2);
                                         startActivity(intent);
                                     }
                                 }
@@ -106,8 +108,13 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
+        binding.btnFb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
+            }
 
+        });
     }
 
     void signIn() {
@@ -122,38 +129,17 @@ public class MainActivity extends AppCompatActivity{
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 task.getResult(ApiException.class);
-                user.setEmail(task.getResult(ApiException.class).getEmail().toString());
-                user.setDisplayName(task.getResult(ApiException.class).getDisplayName().toString());
-                userApiService.create(user, 1)
-                        .subscribeOn(Schedulers.newThread())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeWith(new SingleObserver<User>() {
-                            @Override
-                            public void onSubscribe(@NonNull Disposable d) {
-
-                            }
-
-                            @Override
-                            public void onSuccess(@NonNull User user) {
-                                Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_LONG).show();
-                            }
-                            @Override
-                            public void onError(@NonNull Throwable e) {
-                                Log.d("ERROR: ", e.getMessage());
-                                Toast.makeText(MainActivity.this, "Fail", Toast.LENGTH_LONG).show();
-                            }
-                        });
                 toHome();
+
             } catch (ApiException e) {
                 e.printStackTrace();
             }
         }
     }
-
     void toHome() {
         finish();
         Intent intent = new Intent(MainActivity.this, Home.class);
-        intent.putExtra("status", 2);
+        intent.putExtra("status", 1);
         startActivity(intent);
     }
 }

@@ -1,26 +1,18 @@
 package com.finalproject.todoapp.view;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.finalproject.todoapp.MainActivity;
-import com.finalproject.todoapp.R;
-import com.finalproject.todoapp.databinding.ActivityMainBinding;
 import com.finalproject.todoapp.databinding.ActivityRegisterBinding;
 import com.finalproject.todoapp.model.User;
 import com.finalproject.todoapp.viewmodel.service.UserApiService;
 
-import java.util.Random;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
@@ -32,16 +24,17 @@ public class Register extends AppCompatActivity {
 
     private UserApiService userApiService;
     private ActivityRegisterBinding binding;
-    private static final int MY_PERMISSION_REQUEST_CODE_SEND_SMS = 1;
-    private static final String LOG_TAG = "SendOtpRegister";
     User user;
-    String username, password, confirmPassword ,displayName, email;
+    String username, password, confirmPassword ,displayName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityRegisterBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
+
+        getSupportActionBar().hide();
+
         user = new User();
         userApiService = new UserApiService();
 
@@ -52,14 +45,12 @@ public class Register extends AppCompatActivity {
                 password = binding.passwordRegister.getText().toString();
                 confirmPassword = binding.confirmPasswordRegister.getText().toString();
                 displayName = binding.displaynameRegister.getText().toString();
-                email = binding.emailRegister.getText().toString();
 
-                if (checkEmpty(username) && checkEmpty(password) && checkEmpty(confirmPassword) && checkEmpty(email) && checkEmpty(displayName)){
+                if (checkEmpty(username) && checkEmpty(password) && checkEmpty(confirmPassword) && checkEmpty(displayName)){
                     if (password.equals(confirmPassword)) {
                         user.setUsername(username);
                         user.setPassword(password);
                         user.setDisplayName(displayName);
-                        user.setEmail(email);
 
                         userApiService.create(user, 2)
                                 .subscribeOn(Schedulers.newThread())

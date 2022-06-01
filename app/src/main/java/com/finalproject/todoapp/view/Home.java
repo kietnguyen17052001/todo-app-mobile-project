@@ -4,24 +4,17 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
 import com.finalproject.todoapp.MainActivity;
 import com.finalproject.todoapp.databinding.ActivityHomeBinding;
-import com.finalproject.todoapp.databinding.ActivityRegisterBinding;
 import com.finalproject.todoapp.model.User;
-import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.tasks.OnCompleteListener;
 
 public class Home extends AppCompatActivity {
     private ActivityHomeBinding binding;
@@ -36,13 +29,19 @@ public class Home extends AppCompatActivity {
         View view = binding.getRoot();
         setContentView(view);
 
+
+
         Intent intent = getIntent();
         Integer status = intent.getIntExtra("status", 0);
-        if(status == 1) {
+        if(status == 2) {
             if(intent!=null){
                 user = (User) intent.getSerializableExtra("user");
                 binding.nameHome.setText(user.getDisplayName().toString());
-                binding.emailHome.setText(user.getEmail().toString());
+                if (user.getEmail() != null) {
+                    binding.emailHome.setText(user.getEmail().toString());
+                } else {
+                    binding.emailHome.setText("k co email");
+                }
                 binding.btnLogout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -53,7 +52,7 @@ public class Home extends AppCompatActivity {
                     }
                 });
             }
-        } else {
+        } else if (status == 1){
             gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
             gsc = GoogleSignIn.getClient(this, gso);
 
