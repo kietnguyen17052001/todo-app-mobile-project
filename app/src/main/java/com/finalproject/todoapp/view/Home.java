@@ -34,13 +34,8 @@ public class Home extends AppCompatActivity {
 
         Intent intent = getIntent();
         Integer status = intent.getIntExtra("status", 0);
-<<<<<<< HEAD
-        if(status == 2) {
-            if(intent!=null){
-=======
         if (status == ACCOUNT) {
             if (intent != null) {
->>>>>>> cc5768bd933362bccddcfd84cf24b9ac959d404b
                 user = (User) intent.getSerializableExtra("user");
                 binding.nameHome.setText(user.getDisplayName().toString());
                 if (user.getEmail() != null) {
@@ -58,7 +53,7 @@ public class Home extends AppCompatActivity {
                     }
                 });
             }
-        } else if (status == 1){
+        } else if (status == GOOGLE){
             gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
             gsc = GoogleSignIn.getClient(this, gso);
 

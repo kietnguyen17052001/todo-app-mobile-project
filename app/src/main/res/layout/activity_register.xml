@@ -4,10 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-<<<<<<< HEAD
-    android:orientation="vertical"
-=======
->>>>>>> cc5768bd933362bccddcfd84cf24b9ac959d404b
     android:background="@drawable/background"
     android:gravity="center"
     android:orientation="vertical"
@@ -23,20 +19,6 @@
             android:layout_height="100dp"
             android:background="@drawable/icon_todolist"></View>
 
-<<<<<<< HEAD
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:gravity="center"
-        android:orientation="vertical">
-
-        <View
-            android:layout_width="120dp"
-            android:layout_height="100dp"
-            android:background="@drawable/icon_todolist"></View>
-
-=======
->>>>>>> cc5768bd933362bccddcfd84cf24b9ac959d404b
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -51,12 +33,8 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-<<<<<<< HEAD
-        android:textSize="40dp"
-=======
         android:fontFamily="@font/font"
         android:gravity="center"
->>>>>>> cc5768bd933362bccddcfd84cf24b9ac959d404b
         android:text="Register"
         android:textColor="@color/black"
         android:textSize="60dp"></TextView>
@@ -104,9 +82,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
-<<<<<<< HEAD
-        android:layout_marginTop="10dp"></EditText>
-=======
         android:layout_marginTop="10dp"
         android:layout_marginRight="16dp"
         android:background="@drawable/border_radius"
@@ -114,7 +89,6 @@
         android:padding="16dp"
         android:textSize="16dp"></EditText>
 
->>>>>>> cc5768bd933362bccddcfd84cf24b9ac959d404b
 
     <Button
         android:id="@+id/btn_register"

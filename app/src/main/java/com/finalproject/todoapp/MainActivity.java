@@ -46,16 +46,9 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
-
         getSupportActionBar().hide();
-
-<<<<<<< HEAD
-=======
         user = new User();
-
->>>>>>> cc5768bd933362bccddcfd84cf24b9ac959d404b
         userApiService = new UserApiService();
-
         binding.btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -81,11 +74,7 @@ public class MainActivity extends AppCompatActivity {
                                     if (user != null) {
                                         Intent intent = new Intent(MainActivity.this, Home.class);
                                         intent.putExtra("user", user);
-<<<<<<< HEAD
-                                        intent.putExtra("status", 2);
-=======
                                         intent.putExtra("status", ACCOUNT);
->>>>>>> cc5768bd933362bccddcfd84cf24b9ac959d404b
                                         startActivity(intent);
                                     }
                                 }
@@ -122,13 +111,8 @@ public class MainActivity extends AppCompatActivity {
         binding.btnFb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-<<<<<<< HEAD
             }
-
         });
-=======
->>>>>>> cc5768bd933362bccddcfd84cf24b9ac959d404b
     }
 
     void signIn() {
@@ -174,14 +158,11 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
     void toHome() {
         finish();
         Intent intent = new Intent(MainActivity.this, Home.class);
-<<<<<<< HEAD
-        intent.putExtra("status", 1);
-=======
         intent.putExtra("status", GOOGLE);
->>>>>>> cc5768bd933362bccddcfd84cf24b9ac959d404b
         startActivity(intent);
     }
 }
