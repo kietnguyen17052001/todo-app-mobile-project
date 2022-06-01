@@ -22,6 +22,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class Register extends AppCompatActivity {
 
+    private final int ACCOUNT = 2;
+
     private UserApiService userApiService;
     private ActivityRegisterBinding binding;
     User user;
@@ -52,7 +54,7 @@ public class Register extends AppCompatActivity {
                         user.setPassword(password);
                         user.setDisplayName(displayName);
 
-                        userApiService.create(user, 2)
+                        userApiService.create(user, ACCOUNT)
                                 .subscribeOn(Schedulers.newThread())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribeWith(new SingleObserver<User>() {

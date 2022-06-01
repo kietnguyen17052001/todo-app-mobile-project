@@ -32,6 +32,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class MainActivity extends AppCompatActivity{
     private UserApiService userApiService;
     private User user;
+    private final int GOOGLE = 1;
     private String username, password;
     private int newListId = 4;
     private ActivityMainBinding binding;
@@ -47,6 +48,8 @@ public class MainActivity extends AppCompatActivity{
         setContentView(view);
 
         getSupportActionBar().hide();
+
+        user = new User();
 
         userApiService = new UserApiService();
 
@@ -129,6 +132,29 @@ public class MainActivity extends AppCompatActivity{
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 task.getResult(ApiException.class);
+                String email = task.getResult(ApiException.class).getEmail().toString();
+                String name = task.getResult(ApiException.class).getDisplayName().toString();
+                user.setEmail(email);
+                user.setDisplayName(name);
+                userApiService.create(user, GOOGLE)
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeWith(new SingleObserver<User>() {
+                            @Override
+                            public void onSubscribe(@NonNull Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onSuccess(@NonNull User user) {
+                                Toast.makeText(MainActivity.this, "Tạo mới thành công", Toast.LENGTH_LONG).show();
+                            }
+                            @Override
+                            public void onError(@NonNull Throwable e) {
+                                Log.d("ERROR: ", e.getMessage());
+                                Toast.makeText(MainActivity.this, "Đã có tài khoản", Toast.LENGTH_LONG).show();
+                            }
+                        });
                 toHome();
 
             } catch (ApiException e) {
@@ -139,7 +165,7 @@ public class MainActivity extends AppCompatActivity{
     void toHome() {
         finish();
         Intent intent = new Intent(MainActivity.this, Home.class);
-        intent.putExtra("status", 1);
+        intent.putExtra("status", GOOGLE);
         startActivity(intent);
     }
 }
