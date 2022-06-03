@@ -11,6 +11,9 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface UserApi {
+    @GET("api/users/{id}")
+    Single<User> getUserById(@Path("id") int id);
+
     @GET("api/users")
     Single<User> getUserByUsernameAndPassword(@Query("username") String username, @Query("password") String password);
 
