@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.view.View;
 
@@ -23,6 +24,9 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
 import android.util.Log;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.finalproject.todoapp.model.User;
@@ -41,12 +45,19 @@ public class MainActivity extends AppCompatActivity {
     private User user;
     private static final int GOOGLE = 1, ACCOUNT = 2, FACEBOOK = 4;
     private String username, password;
-    private int newListId = 4;
     private ActivityMainBinding binding;
     private CallbackManager callbackManager;
-
+    private Button btnLoginByAccount;
+    private TextView btnRegister;
+    private ImageView btnLoginByGoogle, btnLoginByFacebook;
     GoogleSignInOptions gso;
     GoogleSignInClient gsc;
+    public void init() {
+        btnLoginByAccount = binding.btnLogin;
+        btnLoginByGoogle = binding.btnGoogle;
+        btnLoginByFacebook = binding.btnFacebook;
+        btnRegister = binding.btnRegister;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,16 +66,15 @@ public class MainActivity extends AppCompatActivity {
         View view = binding.getRoot();
         setContentView(view);
         getSupportActionBar().hide();
-
+        init();
         user = new User();
-
         userApiService = new UserApiService();
-        binding.btnLogin.setOnClickListener(new View.OnClickListener() {
+        btnLoginByAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 username = binding.username.getText().toString();
                 password = binding.password.getText().toString();
-                if (username.length() == 0 || password.length() == 0) {
+                if (username.isEmpty() || password.isEmpty()) {
                     Toast.makeText(MainActivity.this, "Please enter your username or password", Toast.LENGTH_LONG).show();
                 } else {
                     userApiService.getUserByUsernameAndPassword(username, password)
@@ -97,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        binding.btnRegister.setOnClickListener(new View.OnClickListener() {
+        btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intentRegister = new Intent(MainActivity.this, Register.class);
@@ -108,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
         gsc = GoogleSignIn.getClient(this, gso);
 
-        binding.btnGg.setOnClickListener(new View.OnClickListener() {
+        btnLoginByGoogle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 signIn();
@@ -140,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        binding.btnFb.setOnClickListener(new View.OnClickListener() {
+        btnLoginByFacebook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, Arrays.asList("public_profile"));

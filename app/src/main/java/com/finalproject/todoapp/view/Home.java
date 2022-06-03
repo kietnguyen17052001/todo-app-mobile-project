@@ -35,11 +35,11 @@ public class Home extends AppCompatActivity {
     private ActivityHomeBinding binding;
 
     private static final int GOOGLE = 1, ACCOUNT = 2, FACEBOOK = 4;
-    private User user;
     private GoogleSignInOptions gso;
     private GoogleSignInClient gsc;
-
+    private User user;
     private UserApiService userApiService;
+    public void init(){}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,10 +47,8 @@ public class Home extends AppCompatActivity {
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
-
         userApiService = new UserApiService();
         user = new User();
-
         Intent intent = getIntent();
         Integer status = intent.getIntExtra("status", 0);
         if (status == ACCOUNT) {
@@ -67,7 +65,7 @@ public class Home extends AppCompatActivity {
                     }
                 });
             }
-        } else if (status == GOOGLE){
+        } else if (status == GOOGLE) {
             gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
             gsc = GoogleSignIn.getClient(this, gso);
 
@@ -91,7 +89,7 @@ public class Home extends AppCompatActivity {
                     }
                 });
             }
-        } else if(status == FACEBOOK){
+        } else if (status == FACEBOOK) {
 
             AccessToken accessToken = AccessToken.getCurrentAccessToken();
             GraphRequest request = GraphRequest.newMeRequest(
@@ -125,6 +123,7 @@ public class Home extends AppCompatActivity {
                                             public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull User user) {
                                                 Toast.makeText(Home.this, "Success", Toast.LENGTH_LONG).show();
                                             }
+
                                             @Override
                                             public void onError(@NonNull Throwable e) {
                                                 Toast.makeText(Home.this, "Fail", Toast.LENGTH_LONG).show();

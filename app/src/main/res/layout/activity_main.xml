@@ -109,14 +109,14 @@
             android:layout_marginLeft="20dp"
             android:gravity="center">
             <ImageView
-                android:id="@+id/btn_gg"
+                android:id="@+id/btn_google"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_marginRight="16dp"
                 android:src="@drawable/icon_google"></ImageView>
 
             <ImageView
-                android:id="@+id/btn_fb"
+                android:id="@+id/btn_facebook"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_marginLeft="16dp"
