@@ -16,7 +16,9 @@ import com.facebook.login.LoginManager;
 import com.finalproject.todoapp.MainActivity;
 import com.finalproject.todoapp.SessionManagement;
 import com.finalproject.todoapp.databinding.ActivityHomeBinding;
+import com.finalproject.todoapp.model.NewList;
 import com.finalproject.todoapp.model.User;
+import com.finalproject.todoapp.viewmodel.service.NewListApiService;
 import com.finalproject.todoapp.viewmodel.service.UserApiService;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -26,22 +28,26 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.SingleObserver;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.observers.DisposableSingleObserver;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class Home extends AppCompatActivity {
     private ActivityHomeBinding binding;
     private Button btnLogout;
-    private static final int GOOGLE = 1, ACCOUNT = 2, FACEBOOK = 4;
+    private static final int GOOGLE = 1, FACEBOOK = 4;
     private GoogleSignInOptions googleSignInOptions;
     private GoogleSignInClient googleSignInClient;
     private GoogleSignInAccount googleSignInAccount;
     private int userId;
     private User user;
     private UserApiService userApiService;
+    private NewListApiService newListApiService;
     private SessionManagement sessionManagement;
 
     // initial value
@@ -73,7 +79,12 @@ public class Home extends AppCompatActivity {
 
                         @Override
                         public void onSuccess(@NonNull User userResponse) {
-                            user = userResponse;
+                            if (userResponse.getLoginTypeId() == GOOGLE) {
+                                googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
+                                googleSignInClient = GoogleSignIn.getClient(getApplicationContext(), googleSignInOptions);
+                            }
+                            // main
+                            showListItem(userResponse.getId());
                         }
 
                         @Override
@@ -82,7 +93,8 @@ public class Home extends AppCompatActivity {
                         }
                     });
         } else {
-            if (getIntent().getIntExtra("loginTypeId", 0) == GOOGLE) {
+            int loginType = getIntent().getIntExtra("loginTypeId", 0);
+            if (loginType == GOOGLE) {
                 googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
                 googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
                 googleSignInAccount = GoogleSignIn.getLastSignedInAccount(this);
@@ -98,7 +110,8 @@ public class Home extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(@NonNull User userResponse) {
                                     sessionManagement.saveSession(userResponse);
-                                    user = userResponse;
+                                    // main
+                                    showListItem(userResponse.getId());
                                 }
 
                                 @Override
@@ -106,7 +119,7 @@ public class Home extends AppCompatActivity {
                                 }
                             });
                 }
-            } else if (user.getId() == FACEBOOK) {
+            } else {
                 AccessToken accessToken = AccessToken.getCurrentAccessToken();
                 GraphRequest request = GraphRequest.newMeRequest(
                         accessToken,
@@ -117,10 +130,8 @@ public class Home extends AppCompatActivity {
                                     GraphResponse response) {
                                 // Application code
                                 try {
-                                    String name = object.getString("name");
-                                    String id = object.getString("id");
-                                    user.setUsername(id);
-                                    user.setDisplayName(name);
+                                    user.setUsername(object.getString("id"));
+                                    user.setDisplayName(object.getString("name"));
                                     userApiService.create(user, FACEBOOK)
                                             .subscribeOn(Schedulers.newThread())
                                             .observeOn(AndroidSchedulers.mainThread())
@@ -133,6 +144,7 @@ public class Home extends AppCompatActivity {
                                                 @Override
                                                 public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull User user) {
                                                     sessionManagement.saveSession(user);
+                                                    showListItem(user.getId());
                                                 }
 
                                                 @Override
@@ -149,6 +161,7 @@ public class Home extends AppCompatActivity {
                                                                 @Override
                                                                 public void onSuccess(@NonNull User user) {
                                                                     sessionManagement.saveSession(user);
+                                                                    showListItem(user.getId());
                                                                 }
 
                                                                 @Override
@@ -195,5 +208,26 @@ public class Home extends AppCompatActivity {
         Intent intent = new Intent(Home.this, MainActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    // get list item by userId
+    public void showListItem(int userId) {
+        newListApiService = new NewListApiService();
+        newListApiService.getNewListsByUserId(userId)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<List<NewList>>() {
+                    @Override
+                    public void onSuccess(@NonNull List<NewList> newLists) {
+                        for (NewList newList : newLists) {
+                            Log.d("Name", newList.getName());
+                        }
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        Log.e("error", e.getMessage());
+                    }
+                });
     }
 }

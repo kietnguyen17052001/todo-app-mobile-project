@@ -41,7 +41,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int GOOGLE = 1;
+    private static final int GOOGLE = 1, FACEBOOK = 4;
     private UserApiService userApiService;
     private User user;
     private String username, password;
@@ -134,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
                         // App code
+                        loginTypeId = FACEBOOK;
                         moveToHome();
                         finish();
                     }
@@ -185,9 +186,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void moveToHome() {
         Intent intent = new Intent(MainActivity.this, Home.class);
-        if (loginTypeId == GOOGLE){
-            intent.putExtra("loginTypeId", GOOGLE);
-        }
+        intent.putExtra("loginTypeId", loginTypeId);
         startActivity(intent);
     }
 
@@ -218,6 +217,7 @@ public class MainActivity extends AppCompatActivity {
                         public void onError(@NonNull Throwable e) {
                         }
                     });
+            finish();
             moveToHome();
         } catch (ApiException e) {
             e.printStackTrace();
