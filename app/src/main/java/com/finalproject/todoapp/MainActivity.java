@@ -41,17 +41,21 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
+    private static final int GOOGLE = 1;
     private UserApiService userApiService;
     private User user;
-    private static final int GOOGLE = 1, ACCOUNT = 2, FACEBOOK = 4;
     private String username, password;
     private ActivityMainBinding binding;
     private CallbackManager callbackManager;
     private Button btnLoginByAccount;
     private TextView btnRegister;
     private ImageView btnLoginByGoogle, btnLoginByFacebook;
-    GoogleSignInOptions gso;
-    GoogleSignInClient gsc;
+    private GoogleSignInOptions googleSignInOptions;
+    private GoogleSignInClient googleSignInClient;
+    private GoogleSignInAccount googleSignInAccount;
+    private SessionManagement sessionManagement;
+    private int loginTypeId;
+    // initial value
     public void init() {
         btnLoginByAccount = binding.btnLogin;
         btnLoginByGoogle = binding.btnGoogle;
@@ -69,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
         init();
         user = new User();
         userApiService = new UserApiService();
+
+        // Login by normal account
         btnLoginByAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -89,18 +95,14 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(@NonNull User user) {
                                     if (user != null) {
-                                        Intent intent = new Intent(MainActivity.this, Home.class);
-                                        intent.putExtra("user", user);
-                                        intent.putExtra("status", ACCOUNT);
-                                        startActivity(intent);
+                                        saveSession(user);
+                                        moveToHome();
                                     }
                                 }
 
                                 @Override
                                 public void onError(@NonNull Throwable e) {
-                                    Log.d("ERROR: ", e.getMessage());
                                     Toast.makeText(MainActivity.this, "User does not exist", Toast.LENGTH_LONG).show();
-
                                 }
                             });
                 }
@@ -110,14 +112,15 @@ public class MainActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intentRegister = new Intent(MainActivity.this, Register.class);
-                startActivity(intentRegister);
+                Intent intent = new Intent(MainActivity.this, Register.class);
+                startActivity(intent);
             }
         });
 
-        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
-        gsc = GoogleSignIn.getClient(this, gso);
-
+        googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
         btnLoginByGoogle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -126,22 +129,18 @@ public class MainActivity extends AppCompatActivity {
         });
 
         callbackManager = CallbackManager.Factory.create();
-
         LoginManager.getInstance().registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
                         // App code
-                        Intent intent = new Intent(MainActivity.this, Home.class);
-                        intent.putExtra("status", FACEBOOK);
-                        startActivity(intent);
+                        moveToHome();
                         finish();
                     }
 
                     @Override
                     public void onCancel() {
                         // App code
-
                     }
 
                     @Override
@@ -158,9 +157,14 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    void signIn() {
-        Intent signInIntent = gsc.getSignInIntent();
-        startActivityForResult(signInIntent, 1000);
+    @Override
+    protected void onStart() {
+        super.onStart();
+        sessionManagement = new SessionManagement(MainActivity.this);
+        int userId = sessionManagement.getSession();
+        if (userId != -1) {
+            moveToHome();
+        }
     }
 
     @Override
@@ -168,45 +172,55 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1000) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            try {
-                task.getResult(ApiException.class);
-                String email = task.getResult(ApiException.class).getEmail().toString();
-                String name = task.getResult(ApiException.class).getDisplayName().toString();
-                user.setEmail(email);
-                user.setDisplayName(name);
-                userApiService.create(user, GOOGLE)
-                        .subscribeOn(Schedulers.newThread())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeWith(new SingleObserver<User>() {
-                            @Override
-                            public void onSubscribe(@NonNull Disposable d) {
-                            }
-
-                            @Override
-                            public void onSuccess(@NonNull User user) {
-                                Toast.makeText(MainActivity.this, "Tạo mới thành công", Toast.LENGTH_LONG).show();
-                            }
-
-                            @Override
-                            public void onError(@NonNull Throwable e) {
-                                Log.d("ERROR: ", e.getMessage());
-                                Toast.makeText(MainActivity.this, "Đã có tài khoản", Toast.LENGTH_LONG).show();
-                            }
-                        });
-                toHome();
-
-            } catch (ApiException e) {
-                e.printStackTrace();
-            }
+            handleSignInResult(task);
         } else {
             callbackManager.onActivityResult(requestCode, resultCode, data);
         }
     }
 
-    void toHome() {
-        finish();
+    public void saveSession(User user) {
+        sessionManagement = new SessionManagement(MainActivity.this);
+        sessionManagement.saveSession(user);
+    }
+
+    public void moveToHome() {
         Intent intent = new Intent(MainActivity.this, Home.class);
-        intent.putExtra("status", GOOGLE);
+        if (loginTypeId == GOOGLE){
+            intent.putExtra("loginTypeId", GOOGLE);
+        }
         startActivity(intent);
+    }
+
+    public void signIn() {
+        Intent intent = googleSignInClient.getSignInIntent();
+        startActivityForResult(intent, 1000);
+    }
+
+    public void handleSignInResult(Task<GoogleSignInAccount> googleSignInAccountTask) {
+        try {
+            googleSignInAccount = googleSignInAccountTask.getResult(ApiException.class);
+            user.setEmail(googleSignInAccount.getEmail());
+            user.setDisplayName(googleSignInAccount.getDisplayName());
+            loginTypeId = GOOGLE;
+            userApiService.create(user, GOOGLE)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new SingleObserver<User>() {
+                        @Override
+                        public void onSubscribe(@NonNull Disposable d) {
+                        }
+
+                        @Override
+                        public void onSuccess(@NonNull User user) {
+                        }
+
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                        }
+                    });
+            moveToHome();
+        } catch (ApiException e) {
+            e.printStackTrace();
+        }
     }
 }
