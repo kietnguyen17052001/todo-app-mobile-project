@@ -56,7 +56,7 @@ public class Register extends AppCompatActivity {
                 password = etPassword.getText().toString();
                 confirmPassword = etConfirmPassword.getText().toString();
                 displayName = etDisplayName.getText().toString();
-                if (username.isEmpty() && password.isEmpty() && confirmPassword.isEmpty() && displayName.isEmpty()) {
+                if (!username.isEmpty() && !password.isEmpty() && !confirmPassword.isEmpty() && !displayName.isEmpty()) {
                     if (password.equals(confirmPassword)) {
                         user.setUsername(username);
                         user.setPassword(password);
