@@ -20,8 +20,10 @@ public class User implements Serializable {
     private Timestamp createdAt;
     @SerializedName("updatedAt")
     private Timestamp updatedAt;
+    @SerializedName("loginTypeId")
+    private int loginTypeId;
 
-    public User(int id, String displayName, String email, String username, String password, Timestamp createdAt, Timestamp updatedAt) {
+    public User(int id, String displayName, String email, String username, String password, Timestamp createdAt, Timestamp updatedAt, int loginTypeId) {
         this.id = id;
         this.displayName = displayName;
         this.email = email;
@@ -29,6 +31,7 @@ public class User implements Serializable {
         this.password = password;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.loginTypeId = loginTypeId;
     }
 
     public User() {
@@ -88,5 +91,13 @@ public class User implements Serializable {
 
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public int getLoginTypeId() {
+        return loginTypeId;
+    }
+
+    public void setLoginTypeId(int loginTypeId) {
+        this.loginTypeId = loginTypeId;
     }
 }

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -13,33 +14,46 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.finalproject.todoapp.MainActivity;
+import com.finalproject.todoapp.SessionManagement;
 import com.finalproject.todoapp.databinding.ActivityHomeBinding;
+import com.finalproject.todoapp.model.NewList;
 import com.finalproject.todoapp.model.User;
+import com.finalproject.todoapp.viewmodel.service.NewListApiService;
 import com.finalproject.todoapp.viewmodel.service.UserApiService;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.SingleObserver;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.observers.DisposableSingleObserver;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class Home extends AppCompatActivity {
     private ActivityHomeBinding binding;
-
-    private static final int GOOGLE = 1, ACCOUNT = 2, FACEBOOK = 4;
+    private Button btnLogout;
+    private static final int GOOGLE = 1, FACEBOOK = 4;
+    private GoogleSignInOptions googleSignInOptions;
+    private GoogleSignInClient googleSignInClient;
+    private GoogleSignInAccount googleSignInAccount;
+    private int userId;
     private User user;
-    private GoogleSignInOptions gso;
-    private GoogleSignInClient gsc;
-
     private UserApiService userApiService;
+    private NewListApiService newListApiService;
+    private SessionManagement sessionManagement;
+
+    // initial value
+    public void init() {
+        btnLogout = binding.btnLogout;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,109 +61,173 @@ public class Home extends AppCompatActivity {
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
-
+        init();
         userApiService = new UserApiService();
         user = new User();
-
-        Intent intent = getIntent();
-        Integer status = intent.getIntExtra("status", 0);
-        if (status == ACCOUNT) {
-            if (intent != null) {
-                user = (User) intent.getSerializableExtra("user");
-                binding.nameHome.setText(user.getDisplayName().toString());
-                binding.btnLogout.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent1 = new Intent(Home.this, MainActivity.class);
-                        startActivity(intent1);
-                        finish();
-                        Toast.makeText(Home.this, "LogOut", Toast.LENGTH_LONG).show();
-                    }
-                });
-            }
-        } else if (status == GOOGLE){
-            gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
-            gsc = GoogleSignIn.getClient(this, gso);
-
-            GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
-
-            if (acct != null) {
-                String name = acct.getDisplayName();
-                binding.nameHome.setText(name);
-                String url = acct.getPhotoUrl().toString();
-                Picasso.get().load(url).into(binding.avatarHome);
-
-                binding.btnLogout.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        gsc.signOut();
-                        Intent intent1 = new Intent(Home.this, MainActivity.class);
-                        startActivity(intent1);
-                        finish();
-                        Toast.makeText(Home.this, "LogOut", Toast.LENGTH_LONG).show();
-
-                    }
-                });
-            }
-        } else if(status == FACEBOOK){
-
-            AccessToken accessToken = AccessToken.getCurrentAccessToken();
-            GraphRequest request = GraphRequest.newMeRequest(
-                    accessToken,
-                    new GraphRequest.GraphJSONObjectCallback() {
+        sessionManagement = new SessionManagement(Home.this);
+        userId = sessionManagement.getSession();
+        Log.d("userId", String.valueOf(userId));
+        if (userId != -1) {
+            userApiService.getUserById(userId)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new SingleObserver<User>() {
                         @Override
-                        public void onCompleted(
-                                JSONObject object,
-                                GraphResponse response) {
-                            // Application code
-                            try {
-                                String name = object.getString("name");
-                                binding.nameHome.setText(name);
-                                String id = object.getString("id");
-                                String url = object.getJSONObject("picture").getJSONObject("data").getString("url");
-                                Picasso.get().load(url).into(binding.avatarHome);
+                        public void onSubscribe(@NonNull Disposable d) {
 
-                                user.setUsername(id);
-                                user.setDisplayName(name);
+                        }
 
-                                userApiService.create(user, FACEBOOK)
-                                        .subscribeOn(Schedulers.newThread())
-                                        .observeOn(AndroidSchedulers.mainThread())
-                                        .subscribeWith(new SingleObserver<User>() {
-                                            @Override
-                                            public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
-
-                                            }
-
-                                            @Override
-                                            public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull User user) {
-                                                Toast.makeText(Home.this, "Success", Toast.LENGTH_LONG).show();
-                                            }
-                                            @Override
-                                            public void onError(@NonNull Throwable e) {
-                                                Toast.makeText(Home.this, "Fail", Toast.LENGTH_LONG).show();
-                                            }
-                                        });
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+                        @Override
+                        public void onSuccess(@NonNull User userResponse) {
+                            if (userResponse.getLoginTypeId() == GOOGLE) {
+                                googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
+                                googleSignInClient = GoogleSignIn.getClient(getApplicationContext(), googleSignInOptions);
                             }
+                            // main
+                            showListItem(userResponse.getId());
+                        }
+
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+
                         }
                     });
-            Bundle parameters = new Bundle();
-            parameters.putString("fields", "id,name,link, picture.type(large)");
-            request.setParameters(parameters);
-            request.executeAsync();
+        } else {
+            int loginType = getIntent().getIntExtra("loginTypeId", 0);
+            if (loginType == GOOGLE) {
+                googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
+                googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
+                googleSignInAccount = GoogleSignIn.getLastSignedInAccount(this);
+                if (googleSignInAccount != null) {
+                    userApiService.getUserByEmail(googleSignInAccount.getEmail())
+                            .subscribeOn(Schedulers.newThread())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribeWith(new SingleObserver<User>() {
+                                @Override
+                                public void onSubscribe(@NonNull Disposable d) {
+                                }
 
-            binding.btnLogout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    LoginManager.getInstance().logOut();
-                    startActivity(new Intent(Home.this, MainActivity.class));
-                    finish();
+                                @Override
+                                public void onSuccess(@NonNull User userResponse) {
+                                    sessionManagement.saveSession(userResponse);
+                                    // main
+                                    showListItem(userResponse.getId());
+                                }
+
+                                @Override
+                                public void onError(@NonNull Throwable e) {
+                                }
+                            });
                 }
-            });
+            } else {
+                AccessToken accessToken = AccessToken.getCurrentAccessToken();
+                GraphRequest request = GraphRequest.newMeRequest(
+                        accessToken,
+                        new GraphRequest.GraphJSONObjectCallback() {
+                            @Override
+                            public void onCompleted(
+                                    JSONObject object,
+                                    GraphResponse response) {
+                                // Application code
+                                try {
+                                    user.setUsername(object.getString("id"));
+                                    user.setDisplayName(object.getString("name"));
+                                    userApiService.create(user, FACEBOOK)
+                                            .subscribeOn(Schedulers.newThread())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribeWith(new SingleObserver<User>() {
+                                                @Override
+                                                public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+
+                                                }
+
+                                                @Override
+                                                public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull User user) {
+                                                    sessionManagement.saveSession(user);
+                                                    showListItem(user.getId());
+                                                }
+
+                                                @Override
+                                                public void onError(@NonNull Throwable e) {
+                                                    userApiService.getUserByUid(user.getUsername())
+                                                            .subscribeOn(Schedulers.newThread())
+                                                            .observeOn(AndroidSchedulers.mainThread())
+                                                            .subscribeWith(new SingleObserver<User>() {
+                                                                @Override
+                                                                public void onSubscribe(@NonNull Disposable d) {
+
+                                                                }
+
+                                                                @Override
+                                                                public void onSuccess(@NonNull User user) {
+                                                                    sessionManagement.saveSession(user);
+                                                                    showListItem(user.getId());
+                                                                }
+
+                                                                @Override
+                                                                public void onError(@NonNull Throwable e) {
+
+                                                                }
+                                                            });
+                                                }
+                                            });
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,name,link, picture.type(large)");
+                request.setParameters(parameters);
+                request.executeAsync();
+            }
+
         }
 
+        btnLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (user.getLoginTypeId() == GOOGLE) {
+                    googleSignInClient.signOut();
+                } else if (user.getLoginTypeId() == FACEBOOK) {
+                    LoginManager.getInstance().logOut();
+                }
+                logout(view);
+            }
+        });
+    }
 
+    public void logout(View view) {
+        SessionManagement sessionManagement = new SessionManagement(Home.this);
+        sessionManagement.removeSession();
+        moveToMainActivity();
+    }
+
+
+    public void moveToMainActivity() {
+        Intent intent = new Intent(Home.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    // get list item by userId
+    public void showListItem(int userId) {
+        newListApiService = new NewListApiService();
+        newListApiService.getNewListsByUserId(userId)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<List<NewList>>() {
+                    @Override
+                    public void onSuccess(@NonNull List<NewList> newLists) {
+                        for (NewList newList : newLists) {
+                            Log.d("Name", newList.getName());
+                        }
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        Log.e("error", e.getMessage());
+                    }
+                });
     }
 }

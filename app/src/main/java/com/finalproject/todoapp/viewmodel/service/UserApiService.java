@@ -24,6 +24,10 @@ public class UserApiService {
         return api.getUserByUsernameAndPassword(username, password);
     }
 
+    public Single<User> getUserById(int id) {
+        return api.getUserById(id);
+    }
+
     public Single<User> getUserByUid(String uid) {
         return api.getUserByUid(uid);
     }
