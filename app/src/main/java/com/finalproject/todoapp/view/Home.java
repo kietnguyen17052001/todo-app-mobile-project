@@ -5,6 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -14,6 +17,7 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.finalproject.todoapp.MainActivity;
+import com.finalproject.todoapp.R;
 import com.finalproject.todoapp.SessionManagement;
 import com.finalproject.todoapp.databinding.ActivityHomeBinding;
 import com.finalproject.todoapp.model.NewList;
@@ -39,7 +43,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class Home extends AppCompatActivity {
     private ActivityHomeBinding binding;
-    private Button btnLogout;
+//    private Button btnLogout;
     private static final int GOOGLE = 1, FACEBOOK = 4;
     private GoogleSignInOptions googleSignInOptions;
     private GoogleSignInClient googleSignInClient;
@@ -51,9 +55,9 @@ public class Home extends AppCompatActivity {
     private SessionManagement sessionManagement;
 
     // initial value
-    public void init() {
-        btnLogout = binding.btnLogout;
-    }
+//    public void init() {
+//        btnLogout = binding.btnLogout;
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +65,7 @@ public class Home extends AppCompatActivity {
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
-        init();
+//        init();
         userApiService = new UserApiService();
         user = new User();
         sessionManagement = new SessionManagement(Home.this);
@@ -112,6 +116,7 @@ public class Home extends AppCompatActivity {
                                     sessionManagement.saveSession(userResponse);
                                     // main
                                     showListItem(userResponse.getId());
+
                                 }
 
                                 @Override
@@ -184,17 +189,39 @@ public class Home extends AppCompatActivity {
 
         }
 
-        btnLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+//        btnLogout.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (user.getLoginTypeId() == GOOGLE) {
+//                    googleSignInClient.signOut();
+//                } else if (user.getLoginTypeId() == FACEBOOK) {
+//                    LoginManager.getInstance().logOut();
+//                }
+//                logout(view);
+//            }
+//        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.tool_bar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@androidx.annotation.NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.btn_logout_menu:
                 if (user.getLoginTypeId() == GOOGLE) {
                     googleSignInClient.signOut();
                 } else if (user.getLoginTypeId() == FACEBOOK) {
                     LoginManager.getInstance().logOut();
                 }
-                logout(view);
-            }
-        });
+                logout(null);
+                return true;
+        }
+        return true;
     }
 
     public void logout(View view) {
