@@ -1,6 +1,9 @@
 package com.finalproject.todoapp.view;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,10 +31,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -41,9 +48,14 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableSingleObserver;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class Home extends AppCompatActivity {
+public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardViewListener {
     private ActivityHomeBinding binding;
 //    private Button btnLogout;
+    private CardView cvMyDay;
+    private CardView cvImportant;
+    private RecyclerView rcvTaskList;
+    private FloatingActionButton btnAddTask;
+
     private static final int GOOGLE = 1, FACEBOOK = 4;
     private GoogleSignInOptions googleSignInOptions;
     private GoogleSignInClient googleSignInClient;
@@ -54,10 +66,16 @@ public class Home extends AppCompatActivity {
     private NewListApiService newListApiService;
     private SessionManagement sessionManagement;
 
+    private ListNoteAdapter listNoteAdapter;
+
     // initial value
-//    public void init() {
+    public void init() {
 //        btnLogout = binding.btnLogout;
-//    }
+        cvMyDay = binding.cvMyday;
+        cvImportant = binding.cvImportant;
+        rcvTaskList = binding.rcvTaskList;
+        btnAddTask = binding.btnAddTask;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,11 +83,14 @@ public class Home extends AppCompatActivity {
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
-//        init();
+        init();
         userApiService = new UserApiService();
         user = new User();
         sessionManagement = new SessionManagement(Home.this);
         userId = sessionManagement.getSession();
+        listNoteAdapter = new ListNoteAdapter(new ArrayList<>(), this);
+        rcvTaskList.setAdapter(listNoteAdapter);
+        rcvTaskList.setLayoutManager(new LinearLayoutManager(this));
         Log.d("userId", String.valueOf(userId));
         if (userId != -1) {
             userApiService.getUserById(userId)
@@ -200,6 +221,28 @@ public class Home extends AppCompatActivity {
 //                logout(view);
 //            }
 //        });
+
+        cvMyDay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                System.out.println("Change to list of my day");
+            }
+        });
+
+        cvImportant.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                System.out.println("Change to list of important");
+            }
+        });
+
+        btnAddTask.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                System.out.println("in create");
+                createNewList(userId);
+            }
+        });
     }
 
     @Override
@@ -249,6 +292,7 @@ public class Home extends AppCompatActivity {
                         for (NewList newList : newLists) {
                             Log.d("Name", newList.getName());
                         }
+                        listNoteAdapter.setData(new ArrayList<>(newLists));
                     }
 
                     @Override
@@ -256,5 +300,32 @@ public class Home extends AppCompatActivity {
                         Log.e("error", e.getMessage());
                     }
                 });
+    }
+
+    public void createNewList(int userId) {
+        newListApiService = new NewListApiService();
+        newListApiService.create(userId, new NewList(
+                50, "test1",
+                new Timestamp(System.currentTimeMillis()),
+                new Timestamp(System.currentTimeMillis())))
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableSingleObserver<NewList>() {
+                        @Override
+                        public void onSuccess(@NonNull NewList newList) {
+                            Log.d("success", "can create!");
+                            showListItem(userId);
+                        }
+
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                            Log.e("error", e.getMessage());
+                        }
+                    });
+    }
+
+    @Override
+    public void onCardViewCLick(int pos) {
+        System.out.println("rcv clicked!");
     }
 }

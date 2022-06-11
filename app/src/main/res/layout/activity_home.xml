@@ -12,6 +12,7 @@
         android:id="@+id/cv_myday"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="#FFFFD2"
         app:cardElevation="4dp"
         app:cardCornerRadius="8dp"
         android:layout_marginHorizontal="16dp"
@@ -46,6 +47,7 @@
         android:id="@+id/cv_important"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="#FFCFDF"
         app:cardElevation="4dp"
         app:cardCornerRadius="8dp"
         android:layout_marginHorizontal="16dp"
@@ -86,6 +88,7 @@
         ></androidx.recyclerview.widget.RecyclerView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btn_add_task"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
