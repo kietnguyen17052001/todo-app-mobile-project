@@ -59,8 +59,15 @@ public class ListNoteAdapter extends RecyclerView.Adapter<ListNoteAdapter.ViewHo
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    int posClick =getAdapterPosition();
+                    int posClick = getAdapterPosition();
                     onCardViewListener.onCardViewCLick(posClick);
+                }
+            });
+
+            view.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    return false;
                 }
             });
         }
@@ -69,6 +76,7 @@ public class ListNoteAdapter extends RecyclerView.Adapter<ListNoteAdapter.ViewHo
     public interface OnCardViewListener {
         void onCardViewCLick(int pos);
 
+        void onCardViewLongClick(int pos);
     }
 
 }

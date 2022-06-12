@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -88,9 +89,11 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         user = new User();
         sessionManagement = new SessionManagement(Home.this);
         userId = sessionManagement.getSession();
+        newListApiService = new NewListApiService();
         listNoteAdapter = new ListNoteAdapter(new ArrayList<>(), this);
         rcvTaskList.setAdapter(listNoteAdapter);
         rcvTaskList.setLayoutManager(new LinearLayoutManager(this));
+        registerForContextMenu(rcvTaskList);
         Log.d("userId", String.valueOf(userId));
         if (userId != -1) {
             userApiService.getUserById(userId)
@@ -239,7 +242,6 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         btnAddTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println("in create");
                 createNewList(userId);
             }
         });
@@ -250,6 +252,27 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.tool_bar, menu);
         return true;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+        getMenuInflater().inflate(R.menu.home_item_long_click, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(@androidx.annotation.NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.option_edit:
+                System.out.println("Edit!");
+                return true;
+            case R.id.option_delete:
+                System.out.println(item.getGroupId());
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
     }
 
     @Override
@@ -282,7 +305,6 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
 
     // get list item by userId
     public void showListItem(int userId) {
-        newListApiService = new NewListApiService();
         newListApiService.getNewListsByUserId(userId)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -303,17 +325,14 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
     }
 
     public void createNewList(int userId) {
-        newListApiService = new NewListApiService();
-        newListApiService.create(userId, new NewList(
-                50, "test1",
-                new Timestamp(System.currentTimeMillis()),
-                new Timestamp(System.currentTimeMillis())))
+        NewList addNewList = new NewList();
+        addNewList.setName("test 1");
+        newListApiService.create(userId, addNewList)
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<NewList>() {
                         @Override
                         public void onSuccess(@NonNull NewList newList) {
-                            Log.d("success", "can create!");
                             showListItem(userId);
                         }
 
@@ -324,8 +343,17 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
                     });
     }
 
+    public void deleteList(int userId, int pos) {
+        //
+    }
+
     @Override
     public void onCardViewCLick(int pos) {
         System.out.println("rcv clicked!");
+    }
+
+    @Override
+    public void onCardViewLongClick(int pos) {
+        System.out.println("rcv long click!");
     }
 }
