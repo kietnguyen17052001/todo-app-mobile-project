@@ -51,6 +51,9 @@ import io.reactivex.rxjava3.core.SingleObserver;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableSingleObserver;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardViewListener {
     private ActivityHomeBinding binding;
@@ -333,7 +336,18 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
                     public void onSuccess(@NonNull List<NewList> newLists) {
                         int listId = newLists.get(pos).getId();
                         Log.d("get", "" + listId);
-                        newListApiService.delete(userId, listId);
+                        newListApiService.delete(userId, listId)
+                                .enqueue(new Callback<Void>() {
+                                    @Override
+                                    public void onResponse(Call<Void> call, Response<Void> response) {
+                                        showListItem(userId);
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<Void> call, Throwable t) {
+
+                                    }
+                                });
                     }
 
                     @Override
