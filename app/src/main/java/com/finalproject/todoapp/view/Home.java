@@ -1,10 +1,12 @@
 package com.finalproject.todoapp.view;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -93,7 +96,6 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         listNoteAdapter = new ListNoteAdapter(new ArrayList<>(), this);
         rcvTaskList.setAdapter(listNoteAdapter);
         rcvTaskList.setLayoutManager(new LinearLayoutManager(this));
-        registerForContextMenu(rcvTaskList);
         Log.d("userId", String.valueOf(userId));
         if (userId != -1) {
             userApiService.getUserById(userId)
@@ -255,27 +257,6 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-
-        getMenuInflater().inflate(R.menu.home_item_long_click, menu);
-    }
-
-    @Override
-    public boolean onContextItemSelected(@androidx.annotation.NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.option_edit:
-                System.out.println("Edit!");
-                return true;
-            case R.id.option_delete:
-                System.out.println(item.getGroupId());
-                return true;
-            default:
-                return super.onContextItemSelected(item);
-        }
-    }
-
-    @Override
     public boolean onOptionsItemSelected(@androidx.annotation.NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.btn_logout_menu:
@@ -312,7 +293,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
                     @Override
                     public void onSuccess(@NonNull List<NewList> newLists) {
                         for (NewList newList : newLists) {
-                            Log.d("Name", newList.getName());
+                            Log.d("Name", newList.getId() + newList.getName());
                         }
                         listNoteAdapter.setData(new ArrayList<>(newLists));
                     }
@@ -344,7 +325,22 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
     }
 
     public void deleteList(int userId, int pos) {
-        //
+        newListApiService.getNewListsByUserId(userId)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<List<NewList>>() {
+                    @Override
+                    public void onSuccess(@NonNull List<NewList> newLists) {
+                        int listId = newLists.get(pos).getId();
+                        Log.d("get", "" + listId);
+                        newListApiService.delete(userId, listId);
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        Log.e("error", e.getMessage());
+                    }
+                });
     }
 
     @Override
@@ -353,7 +349,41 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
     }
 
     @Override
-    public void onCardViewLongClick(int pos) {
-        System.out.println("rcv long click!");
+    public void onCardViewLongClick(View view, int pos) {
+        PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
+        popupMenu.inflate(R.menu.home_item_long_click);
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.option_edit:
+                        Log.d("Click", pos + " edit");
+                        return true;
+                    case R.id.option_delete:
+                        Log.d("Click", pos + " delete");
+                        AlertDialog.Builder builder = new AlertDialog.Builder(Home.this);
+                        builder.setCancelable(true);
+                        builder.setTitle("WARNING!");
+                        builder.setMessage("Are you sure want to delete?");
+                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                deleteList(userId, pos);
+                            }
+                        });
+                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+                            }
+                        });
+                        builder.show();
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+        popupMenu.show();
     }
 }

@@ -3,6 +3,7 @@ package com.finalproject.todoapp.view;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -67,16 +68,20 @@ public class ListNoteAdapter extends RecyclerView.Adapter<ListNoteAdapter.ViewHo
             view.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
-                    return false;
+                    int posClick = getAdapterPosition();
+                    onCardViewListener.onCardViewLongClick(view, posClick);
+                    return true;
                 }
             });
         }
+
+
     }
 
     public interface OnCardViewListener {
         void onCardViewCLick(int pos);
 
-        void onCardViewLongClick(int pos);
+        void onCardViewLongClick(View view, int pos);
     }
 
 }
