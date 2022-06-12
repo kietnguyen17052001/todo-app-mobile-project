@@ -5,6 +5,7 @@ import com.finalproject.todoapp.model.NewList;
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Single;
+import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
@@ -23,5 +24,5 @@ public interface NewListApi {
     Single<NewList> update(@Path("id") int id, @Path("newListId") int newListId, @Body NewList newList);
 
     @DELETE("api/users/{id}/newLists/{newListId}")
-    void delete(@Path("id") int id, @Path("newListId") int newListId);
+    Call<Void> delete(@Path("id") int id, @Path("newListId") int newListId);
 }

@@ -7,6 +7,7 @@ import java.util.List;
 
 import hu.akarnokd.rxjava3.retrofit.RxJava3CallAdapterFactory;
 import io.reactivex.rxjava3.core.Single;
+import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -54,7 +55,7 @@ public class TaskApiService {
         return api.completed(userId, taskId);
     }
 
-    public void delete(int userId, int taskId) {
-        api.delete(userId, taskId);
+    public Call<Void> delete(int userId, int taskId) {
+        return api.delete(userId, taskId);
     }
 }
