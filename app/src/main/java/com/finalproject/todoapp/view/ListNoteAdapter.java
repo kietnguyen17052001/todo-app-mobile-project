@@ -7,6 +7,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finalproject.todoapp.R;
@@ -27,6 +28,18 @@ public class ListNoteAdapter extends RecyclerView.Adapter<ListNoteAdapter.ViewHo
     public void setData(ArrayList<NewList> lists) {
         this.setNewListNote = lists;
         notifyDataSetChanged();
+    }
+
+    public int getListId(int pos) {
+        return this.setNewListNote.get(pos).getId();
+    }
+
+    public void onMoveItem(int fromPos, int toPos) {
+        NewList fromList = this.setNewListNote.get(fromPos);
+        this.setNewListNote.remove(fromList);
+        this.setNewListNote.add(toPos, fromList);
+        System.out.println("" + fromList + " " + toPos);
+        notifyItemMoved(fromPos, toPos);
     }
 
     @NonNull
