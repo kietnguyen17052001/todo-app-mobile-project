@@ -1,13 +1,16 @@
 package com.finalproject.todoapp.view;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -99,6 +102,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         listNoteAdapter = new ListNoteAdapter(new ArrayList<>(), this);
         rcvTaskList.setAdapter(listNoteAdapter);
         rcvTaskList.setLayoutManager(new LinearLayoutManager(this));
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(rcvTaskList);
         Log.d("userId", String.valueOf(userId));
         if (userId != -1) {
             userApiService.getUserById(userId)
@@ -295,9 +299,9 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
                 .subscribeWith(new DisposableSingleObserver<List<NewList>>() {
                     @Override
                     public void onSuccess(@NonNull List<NewList> newLists) {
-                        for (NewList newList : newLists) {
-                            Log.d("Name", newList.getId() + newList.getName());
-                        }
+//                        for (NewList newList : newLists) {
+//                            Log.d("Name", newList.getId() + newList.getName());
+//                        }
                         listNoteAdapter.setData(new ArrayList<>(newLists));
                     }
 
@@ -328,33 +332,36 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
     }
 
     public void deleteList(int userId, int pos) {
-        newListApiService.getNewListsByUserId(userId)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableSingleObserver<List<NewList>>() {
-                    @Override
-                    public void onSuccess(@NonNull List<NewList> newLists) {
-                        int listId = newLists.get(pos).getId();
-                        Log.d("get", "" + listId);
-                        newListApiService.delete(userId, listId)
-                                .enqueue(new Callback<Void>() {
-                                    @Override
-                                    public void onResponse(Call<Void> call, Response<Void> response) {
-                                        showListItem(userId);
-                                    }
+        int listId = listNoteAdapter.getListId(pos);
+        AlertDialog.Builder builder = new AlertDialog.Builder(Home.this);
+        builder.setCancelable(true);
+        builder.setTitle("WARNING!");
+        builder.setMessage("Are you sure want to delete?");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                newListApiService.delete(userId, listId)
+                        .enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                showListItem(userId);
+                            }
 
-                                    @Override
-                                    public void onFailure(Call<Void> call, Throwable t) {
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
 
-                                    }
-                                });
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        Log.e("error", e.getMessage());
-                    }
-                });
+                            }
+                        });
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                showListItem(userId);
+                dialogInterface.cancel();
+            }
+        });
+        builder.show();
     }
 
     @Override
@@ -374,24 +381,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
                         Log.d("Click", pos + " edit");
                         return true;
                     case R.id.option_delete:
-                        Log.d("Click", pos + " delete");
-                        AlertDialog.Builder builder = new AlertDialog.Builder(Home.this);
-                        builder.setCancelable(true);
-                        builder.setTitle("WARNING!");
-                        builder.setMessage("Are you sure want to delete?");
-                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                deleteList(userId, pos);
-                            }
-                        });
-                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.cancel();
-                            }
-                        });
-                        builder.show();
+                        deleteList(userId, pos);
                         return true;
                     default:
                         return false;
@@ -400,4 +390,21 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         });
         popupMenu.show();
     }
+
+    ItemTouchHelper.SimpleCallback itemTouchHelperCallback =
+            new ItemTouchHelper.SimpleCallback(
+                    ItemTouchHelper.UP | ItemTouchHelper.DOWN,
+                    ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
+
+        @Override
+        public boolean onMove(@androidx.annotation.NonNull RecyclerView recyclerView, @androidx.annotation.NonNull RecyclerView.ViewHolder viewHolder, @androidx.annotation.NonNull RecyclerView.ViewHolder target) {
+//            listNoteAdapter.onMoveItem(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+            return true;
+        }
+
+        @Override
+        public void onSwiped(@androidx.annotation.NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            deleteList(userId, viewHolder.getAdapterPosition());
+        }
+    };
 }
