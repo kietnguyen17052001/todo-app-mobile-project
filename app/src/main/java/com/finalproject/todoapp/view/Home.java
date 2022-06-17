@@ -1,12 +1,25 @@
 package com.finalproject.todoapp.view;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -14,6 +27,7 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.finalproject.todoapp.MainActivity;
+import com.finalproject.todoapp.R;
 import com.finalproject.todoapp.SessionManagement;
 import com.finalproject.todoapp.databinding.ActivityHomeBinding;
 import com.finalproject.todoapp.model.NewList;
@@ -24,10 +38,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -36,10 +54,18 @@ import io.reactivex.rxjava3.core.SingleObserver;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableSingleObserver;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-public class Home extends AppCompatActivity {
+public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardViewListener {
     private ActivityHomeBinding binding;
-    private Button btnLogout;
+//    private Button btnLogout;
+    private CardView cvMyDay;
+    private CardView cvImportant;
+    private RecyclerView rcvTaskList;
+    private FloatingActionButton btnAddTask;
+
     private static final int GOOGLE = 1, FACEBOOK = 4;
     private GoogleSignInOptions googleSignInOptions;
     private GoogleSignInClient googleSignInClient;
@@ -50,9 +76,15 @@ public class Home extends AppCompatActivity {
     private NewListApiService newListApiService;
     private SessionManagement sessionManagement;
 
+    private ListNoteAdapter listNoteAdapter;
+
     // initial value
     public void init() {
-        btnLogout = binding.btnLogout;
+//        btnLogout = binding.btnLogout;
+        cvMyDay = binding.cvMyday;
+        cvImportant = binding.cvImportant;
+        rcvTaskList = binding.rcvTaskList;
+        btnAddTask = binding.btnAddTask;
     }
 
     @Override
@@ -66,6 +98,11 @@ public class Home extends AppCompatActivity {
         user = new User();
         sessionManagement = new SessionManagement(Home.this);
         userId = sessionManagement.getSession();
+        newListApiService = new NewListApiService();
+        listNoteAdapter = new ListNoteAdapter(new ArrayList<>(), this);
+        rcvTaskList.setAdapter(listNoteAdapter);
+        rcvTaskList.setLayoutManager(new LinearLayoutManager(this));
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(rcvTaskList);
         Log.d("userId", String.valueOf(userId));
         if (userId != -1) {
             userApiService.getUserById(userId)
@@ -112,6 +149,7 @@ public class Home extends AppCompatActivity {
                                     sessionManagement.saveSession(userResponse);
                                     // main
                                     showListItem(userResponse.getId());
+
                                 }
 
                                 @Override
@@ -184,17 +222,60 @@ public class Home extends AppCompatActivity {
 
         }
 
-        btnLogout.setOnClickListener(new View.OnClickListener() {
+//        btnLogout.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (user.getLoginTypeId() == GOOGLE) {
+//                    googleSignInClient.signOut();
+//                } else if (user.getLoginTypeId() == FACEBOOK) {
+//                    LoginManager.getInstance().logOut();
+//                }
+//                logout(view);
+//            }
+//        });
+
+        cvMyDay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                System.out.println("Change to list of my day");
+            }
+        });
+
+        cvImportant.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                System.out.println("Change to list of important");
+            }
+        });
+
+        btnAddTask.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                createNewList(userId);
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.tool_bar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@androidx.annotation.NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.btn_logout_menu:
                 if (user.getLoginTypeId() == GOOGLE) {
                     googleSignInClient.signOut();
                 } else if (user.getLoginTypeId() == FACEBOOK) {
                     LoginManager.getInstance().logOut();
                 }
-                logout(view);
-            }
-        });
+                logout(null);
+                return true;
+        }
+        return true;
     }
 
     public void logout(View view) {
@@ -212,16 +293,16 @@ public class Home extends AppCompatActivity {
 
     // get list item by userId
     public void showListItem(int userId) {
-        newListApiService = new NewListApiService();
         newListApiService.getNewListsByUserId(userId)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<List<NewList>>() {
                     @Override
                     public void onSuccess(@NonNull List<NewList> newLists) {
-                        for (NewList newList : newLists) {
-                            Log.d("Name", newList.getName());
-                        }
+//                        for (NewList newList : newLists) {
+//                            Log.d("Name", newList.getId() + newList.getName());
+//                        }
+                        listNoteAdapter.setData(new ArrayList<>(newLists));
                     }
 
                     @Override
@@ -230,4 +311,100 @@ public class Home extends AppCompatActivity {
                     }
                 });
     }
+
+    public void createNewList(int userId) {
+        NewList addNewList = new NewList();
+        addNewList.setName("test 1");
+        newListApiService.create(userId, addNewList)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableSingleObserver<NewList>() {
+                        @Override
+                        public void onSuccess(@NonNull NewList newList) {
+                            showListItem(userId);
+                        }
+
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                            Log.e("error", e.getMessage());
+                        }
+                    });
+    }
+
+    public void deleteList(int userId, int pos) {
+        int listId = listNoteAdapter.getListId(pos);
+        AlertDialog.Builder builder = new AlertDialog.Builder(Home.this);
+        builder.setCancelable(true);
+        builder.setTitle("WARNING!");
+        builder.setMessage("Are you sure want to delete?");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                newListApiService.delete(userId, listId)
+                        .enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                showListItem(userId);
+                            }
+
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
+
+                            }
+                        });
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                showListItem(userId);
+                dialogInterface.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    @Override
+    public void onCardViewCLick(int pos) {
+        System.out.println("rcv clicked!");
+    }
+
+    @Override
+    public void onCardViewLongClick(View view, int pos) {
+        PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
+        popupMenu.inflate(R.menu.home_item_long_click);
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.option_edit:
+                        Log.d("Click", pos + " edit");
+                        return true;
+                    case R.id.option_delete:
+                        deleteList(userId, pos);
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+        popupMenu.show();
+    }
+
+    ItemTouchHelper.SimpleCallback itemTouchHelperCallback =
+            new ItemTouchHelper.SimpleCallback(
+                    ItemTouchHelper.UP | ItemTouchHelper.DOWN,
+                    ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
+
+        @Override
+        public boolean onMove(@androidx.annotation.NonNull RecyclerView recyclerView, @androidx.annotation.NonNull RecyclerView.ViewHolder viewHolder, @androidx.annotation.NonNull RecyclerView.ViewHolder target) {
+//            listNoteAdapter.onMoveItem(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+            return true;
+        }
+
+        @Override
+        public void onSwiped(@androidx.annotation.NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            deleteList(userId, viewHolder.getAdapterPosition());
+        }
+    };
 }
