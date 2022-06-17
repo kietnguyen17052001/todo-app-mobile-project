@@ -43,9 +43,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.sql.Timestamp;
+
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -60,7 +59,7 @@ import retrofit2.Response;
 
 public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardViewListener {
     private ActivityHomeBinding binding;
-//    private Button btnLogout;
+    //    private Button btnLogout;
     private CardView cvMyDay;
     private CardView cvImportant;
     private RecyclerView rcvTaskList;
@@ -121,6 +120,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
                                 googleSignInClient = GoogleSignIn.getClient(getApplicationContext(), googleSignInOptions);
                             }
                             // main
+                            Log.d("user id", String.valueOf(userId));
                             showListItem(userResponse.getId());
                         }
 
@@ -316,19 +316,19 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         NewList addNewList = new NewList();
         addNewList.setName("test 1");
         newListApiService.create(userId, addNewList)
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeWith(new DisposableSingleObserver<NewList>() {
-                        @Override
-                        public void onSuccess(@NonNull NewList newList) {
-                            showListItem(userId);
-                        }
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<NewList>() {
+                    @Override
+                    public void onSuccess(@NonNull NewList newList) {
+                        showListItem(userId);
+                    }
 
-                        @Override
-                        public void onError(@NonNull Throwable e) {
-                            Log.e("error", e.getMessage());
-                        }
-                    });
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        Log.e("error", e.getMessage());
+                    }
+                });
     }
 
     public void deleteList(int userId, int pos) {
@@ -396,15 +396,15 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
                     ItemTouchHelper.UP | ItemTouchHelper.DOWN,
                     ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
 
-        @Override
-        public boolean onMove(@androidx.annotation.NonNull RecyclerView recyclerView, @androidx.annotation.NonNull RecyclerView.ViewHolder viewHolder, @androidx.annotation.NonNull RecyclerView.ViewHolder target) {
+                @Override
+                public boolean onMove(@androidx.annotation.NonNull RecyclerView recyclerView, @androidx.annotation.NonNull RecyclerView.ViewHolder viewHolder, @androidx.annotation.NonNull RecyclerView.ViewHolder target) {
 //            listNoteAdapter.onMoveItem(viewHolder.getAdapterPosition(), target.getAdapterPosition());
-            return true;
-        }
+                    return true;
+                }
 
-        @Override
-        public void onSwiped(@androidx.annotation.NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-            deleteList(userId, viewHolder.getAdapterPosition());
-        }
-    };
+                @Override
+                public void onSwiped(@androidx.annotation.NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                    deleteList(userId, viewHolder.getAdapterPosition());
+                }
+            };
 }
