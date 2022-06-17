@@ -3,6 +3,7 @@ package com.finalproject.todoapp.view;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
@@ -32,6 +33,10 @@ public class ListNoteAdapter extends RecyclerView.Adapter<ListNoteAdapter.ViewHo
 
     public int getListId(int pos) {
         return this.setNewListNote.get(pos).getId();
+    }
+
+    public NewList getListByPos(int pos) {
+        return this.setNewListNote.get(pos);
     }
 
     public void onMoveItem(int fromPos, int toPos) {
@@ -64,11 +69,13 @@ public class ListNoteAdapter extends RecyclerView.Adapter<ListNoteAdapter.ViewHo
 
     public TextView tvNewListName;
     public OnCardViewListener onCardViewListener;
+    public ImageButton ibMenu;
 
         public ViewHolder(View view, OnCardViewListener onCardViewListener) {
             super(view);
-            tvNewListName = view.findViewById(R.id.tv_newlist_name);
+            this.tvNewListName = view.findViewById(R.id.tv_newlist_name);
             this.onCardViewListener = onCardViewListener;
+            this.ibMenu = view.findViewById(R.id.ib_menu);
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
