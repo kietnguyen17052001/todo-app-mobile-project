@@ -80,13 +80,13 @@
 
             <TextView
                 android:id="@+id/tv_darkmode"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:text="Dark Mode"
                 android:textSize="23sp"
                 android:fontFamily="sans-serif"
                 android:textStyle="bold"
-                android:gravity="center"
+                android:gravity="center_vertical"
                 android:layout_marginLeft="20dp"
                 />
 
@@ -101,14 +101,14 @@
 
             <TextView
                 android:id="@+id/tv_about"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_below="@+id/tv_darkmode"
                 android:text="About us"
                 android:textSize="23sp"
                 android:fontFamily="sans-serif"
                 android:textStyle="bold"
-                android:gravity="center"
+                android:gravity="center_vertical"
                 android:layout_marginLeft="20dp"
                 />
 

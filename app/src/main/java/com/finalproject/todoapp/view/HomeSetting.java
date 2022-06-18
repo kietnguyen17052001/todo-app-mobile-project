@@ -40,7 +40,7 @@ public class HomeSetting extends AppCompatActivity implements ListNameDialog.Lis
     }
 
     public void openInputDialog(String nameActivity, int pos) {
-        ListNameDialog listNameDialog = new ListNameDialog(nameActivity, pos);
+        ListNameDialog listNameDialog = new ListNameDialog(nameActivity, pos, null);
         listNameDialog.show(getSupportFragmentManager(), "Dialog");
     }
 

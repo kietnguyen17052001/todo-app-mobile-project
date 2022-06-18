@@ -255,7 +255,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         btnAddTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openInputDialog("Create", -1);
+                openInputDialog("Create", -1, null);
                 //createNewList(userId);
             }
         });
@@ -307,8 +307,8 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         return true;
     }
 
-    public void openInputDialog(String nameActivity, int pos) {
-        ListNameDialog listNameDialog = new ListNameDialog(nameActivity, pos);
+    public void openInputDialog(String nameActivity, int pos, String listOldName) {
+        ListNameDialog listNameDialog = new ListNameDialog(nameActivity, pos, listOldName);
         listNameDialog.show(getSupportFragmentManager(), "Dialog");
     }
 
@@ -354,8 +354,8 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
 
     public void renameList(int pos, String listName) {
         NewList list = listNoteAdapter.getListByPos(pos);
-        list.setName(listName);
         System.out.println(list.getName());
+        list.setName(listName);
         newListApiService.update(userId, list)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -413,6 +413,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
 
     @Override
     public void onCardViewMenuClick(View view, int pos) {
+        NewList list = listNoteAdapter.getListByPos(pos);
         PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
         popupMenu.inflate(R.menu.home_item_long_click);
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -420,7 +421,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.option_edit:
-                        openInputDialog("Rename", pos);
+                        openInputDialog("Rename", pos, list.getName());
                         return true;
                     case R.id.option_delete:
                         deleteList(pos);
