@@ -51,7 +51,7 @@ public class ListNoteAdapter extends RecyclerView.Adapter<ListNoteAdapter.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.task_list_layout, parent, false);
+                .inflate(R.layout.task_list_layout, parent, false);
         return new ViewHolder(view, onCardViewListener);
     }
 
@@ -67,9 +67,9 @@ public class ListNoteAdapter extends RecyclerView.Adapter<ListNoteAdapter.ViewHo
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-    public TextView tvNewListName;
-    public OnCardViewListener onCardViewListener;
-    public ImageButton ibMenu;
+        public TextView tvNewListName;
+        public OnCardViewListener onCardViewListener;
+        public ImageButton ibMenu;
 
         public ViewHolder(View view, OnCardViewListener onCardViewListener) {
             super(view);

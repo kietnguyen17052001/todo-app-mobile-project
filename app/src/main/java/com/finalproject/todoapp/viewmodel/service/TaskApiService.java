@@ -47,12 +47,8 @@ public class TaskApiService {
         return api.createNewListTask(userId, newListId, task);
     }
 
-    public Single<Task> update(int userId, int taskId, Task task) {
-        return api.update(userId, taskId, task);
-    }
-
-    public Single<Task> completed(int userId, int taskId) {
-        return api.completed(userId, taskId);
+    public Single<Task> update(int userId, Task task) {
+        return api.update(userId, task);
     }
 
     public Call<Void> delete(int userId, int taskId) {

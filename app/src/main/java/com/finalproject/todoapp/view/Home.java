@@ -61,7 +61,7 @@ import retrofit2.Response;
 
 public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardViewListener, ListNameDialog.ListNameDialogListener {
     private ActivityHomeBinding binding;
-//    private Button btnLogout;
+    //    private Button btnLogout;
     private CardView cvMyDay;
     private CardView cvImportant;
     private RecyclerView rcvTaskList;
@@ -259,6 +259,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
                 //createNewList(userId);
             }
         });
+
     }
 
     @Override
@@ -336,25 +337,26 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         NewList addNewList = new NewList();
         addNewList.setName(listName);
         newListApiService.create(this.userId, addNewList)
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeWith(new DisposableSingleObserver<NewList>() {
-                        @Override
-                        public void onSuccess(@NonNull NewList newList) {
-                            showListItem();
-                        }
-                        @Override
-                        public void onError(@NonNull Throwable e) {
-                            Log.e("error", e.getMessage());
-                        }
-                    });
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<NewList>() {
+                    @Override
+                    public void onSuccess(@NonNull NewList newList) {
+                        showListItem();
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        Log.e("error", e.getMessage());
+                    }
+                });
     }
 
     public void renameList(int pos, String listName) {
         NewList list = listNoteAdapter.getListByPos(pos);
         list.setName(listName);
         System.out.println(list.getName());
-        newListApiService.update(userId, list.getId(), list)
+        newListApiService.update(userId, list)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<NewList>() {
@@ -433,10 +435,9 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
 
     @Override
     public void sendListName(String nameActivity, int pos, String listName) {
-        if(nameActivity == "Create") {
+        if (nameActivity == "Create") {
             createNewList(listName);
-        }
-        else {
+        } else {
             renameList(pos, listName);
         }
     }
