@@ -43,8 +43,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -57,7 +58,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardViewListener {
+public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardViewListener, ListNameDialog.ListNameDialogListener {
     private ActivityHomeBinding binding;
     //    private Button btnLogout;
     private CardView cvMyDay;
@@ -120,8 +121,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
                                 googleSignInClient = GoogleSignIn.getClient(getApplicationContext(), googleSignInOptions);
                             }
                             // main
-                            Log.d("user id", String.valueOf(userId));
-                            showListItem(userResponse.getId());
+                            showListItem();
                         }
 
                         @Override
@@ -147,8 +147,9 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
                                 @Override
                                 public void onSuccess(@NonNull User userResponse) {
                                     sessionManagement.saveSession(userResponse);
+                                    userId = userResponse.getId();
                                     // main
-                                    showListItem(userResponse.getId());
+                                    showListItem();
 
                                 }
 
@@ -182,7 +183,8 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
                                                 @Override
                                                 public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull User user) {
                                                     sessionManagement.saveSession(user);
-                                                    showListItem(user.getId());
+                                                    userId = user.getId();
+                                                    showListItem();
                                                 }
 
                                                 @Override
@@ -199,7 +201,8 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
                                                                 @Override
                                                                 public void onSuccess(@NonNull User user) {
                                                                     sessionManagement.saveSession(user);
-                                                                    showListItem(user.getId());
+                                                                    userId = user.getId();
+                                                                    showListItem();
                                                                 }
 
                                                                 @Override
@@ -251,9 +254,11 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         btnAddTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                createNewList(userId);
+                openInputDialog("Create", -1);
+                //createNewList(userId);
             }
         });
+
     }
 
     @Override
@@ -291,9 +296,14 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         finish();
     }
 
+    public void openInputDialog(String nameActivity, int pos) {
+        ListNameDialog listNameDialog = new ListNameDialog(nameActivity, pos);
+        listNameDialog.show(getSupportFragmentManager(), "Dialog");
+    }
+
     // get list item by userId
-    public void showListItem(int userId) {
-        newListApiService.getNewListsByUserId(userId)
+    public void showListItem() {
+        newListApiService.getNewListsByUserId(this.userId)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<List<NewList>>() {
@@ -312,16 +322,16 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
                 });
     }
 
-    public void createNewList(int userId) {
+    public void createNewList(String listName) {
         NewList addNewList = new NewList();
-        addNewList.setName("test 1");
-        newListApiService.create(userId, addNewList)
+        addNewList.setName(listName);
+        newListApiService.create(this.userId, addNewList)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<NewList>() {
                     @Override
                     public void onSuccess(@NonNull NewList newList) {
-                        showListItem(userId);
+                        showListItem();
                     }
 
                     @Override
@@ -331,7 +341,27 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
                 });
     }
 
-    public void deleteList(int userId, int pos) {
+    public void renameList(int pos, String listName) {
+        NewList list = listNoteAdapter.getListByPos(pos);
+        list.setName(listName);
+        System.out.println(list.getName());
+        newListApiService.update(userId, list)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<NewList>() {
+                    @Override
+                    public void onSuccess(@NonNull NewList newList) {
+                        showListItem();
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        Log.e("error", e.getMessage());
+                    }
+                });
+    }
+
+    public void deleteList(int pos) {
         int listId = listNoteAdapter.getListId(pos);
         AlertDialog.Builder builder = new AlertDialog.Builder(Home.this);
         builder.setCancelable(true);
@@ -344,7 +374,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
                         .enqueue(new Callback<Void>() {
                             @Override
                             public void onResponse(Call<Void> call, Response<Void> response) {
-                                showListItem(userId);
+                                showListItem();
                             }
 
                             @Override
@@ -357,7 +387,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                showListItem(userId);
+                showListItem();
                 dialogInterface.cancel();
             }
         });
@@ -378,10 +408,10 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.option_edit:
-                        Log.d("Click", pos + " edit");
+                        openInputDialog("Rename", pos);
                         return true;
                     case R.id.option_delete:
-                        deleteList(userId, pos);
+                        deleteList(pos);
                         return true;
                     default:
                         return false;
@@ -389,6 +419,15 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
             }
         });
         popupMenu.show();
+    }
+
+    @Override
+    public void sendListName(String nameActivity, int pos, String listName) {
+        if (nameActivity == "Create") {
+            createNewList(listName);
+        } else {
+            renameList(pos, listName);
+        }
     }
 
     ItemTouchHelper.SimpleCallback itemTouchHelperCallback =
@@ -404,7 +443,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
 
                 @Override
                 public void onSwiped(@androidx.annotation.NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                    deleteList(userId, viewHolder.getAdapterPosition());
+                    deleteList(viewHolder.getAdapterPosition());
                 }
             };
 }

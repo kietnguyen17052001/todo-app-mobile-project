@@ -3,6 +3,7 @@ package com.finalproject.todoapp.view;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
@@ -34,6 +35,10 @@ public class ListNoteAdapter extends RecyclerView.Adapter<ListNoteAdapter.ViewHo
         return this.setNewListNote.get(pos).getId();
     }
 
+    public NewList getListByPos(int pos) {
+        return this.setNewListNote.get(pos);
+    }
+
     public void onMoveItem(int fromPos, int toPos) {
         NewList fromList = this.setNewListNote.get(fromPos);
         this.setNewListNote.remove(fromList);
@@ -46,7 +51,7 @@ public class ListNoteAdapter extends RecyclerView.Adapter<ListNoteAdapter.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.task_list_layout, parent, false);
+                .inflate(R.layout.task_list_layout, parent, false);
         return new ViewHolder(view, onCardViewListener);
     }
 
@@ -62,13 +67,15 @@ public class ListNoteAdapter extends RecyclerView.Adapter<ListNoteAdapter.ViewHo
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-    public TextView tvNewListName;
-    public OnCardViewListener onCardViewListener;
+        public TextView tvNewListName;
+        public OnCardViewListener onCardViewListener;
+        public ImageButton ibMenu;
 
         public ViewHolder(View view, OnCardViewListener onCardViewListener) {
             super(view);
-            tvNewListName = view.findViewById(R.id.tv_newlist_name);
+            this.tvNewListName = view.findViewById(R.id.tv_newlist_name);
             this.onCardViewListener = onCardViewListener;
+            this.ibMenu = view.findViewById(R.id.ib_menu);
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override

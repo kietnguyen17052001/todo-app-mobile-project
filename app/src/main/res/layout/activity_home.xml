@@ -16,42 +16,39 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
+            android:layout_height="match_parent">
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cv_myday"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="#FFFFD2"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="8dp"
                 android:layout_marginHorizontal="16dp"
-                android:layout_marginVertical="8dp">
+                android:layout_marginVertical="8dp"
+                android:backgroundTint="#FFFFD2"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:background="?android:selectableItemBackground">
+                    android:background="?android:selectableItemBackground"
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:src="@drawable/ic_baseline_today_24"
                         android:layout_marginLeft="10dp"
-                        ></ImageView>
+                        android:src="@drawable/ic_baseline_today_24"></ImageView>
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
-                        android:textSize="25sp"
-                        android:text="My day"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif"
-                        android:layout_marginLeft="12dp"
                         android:layout_gravity="center_vertical"
-                        ></TextView>
+                        android:layout_marginLeft="12dp"
+                        android:fontFamily="sans-serif"
+                        android:text="My day"
+                        android:textSize="25sp"
+                        android:textStyle="bold"></TextView>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -59,36 +56,34 @@
                 android:id="@+id/cv_important"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="#FFCFDF"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="8dp"
+                android:layout_below="@id/cv_myday"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginVertical="8dp"
-                android:layout_below="@id/cv_myday">
+                android:backgroundTint="#FFCFDF"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:background="?android:selectableItemBackground">
+                    android:background="?android:selectableItemBackground"
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:src="@drawable/ic_baseline_notification_important_24"
                         android:layout_marginLeft="10dp"
-                        ></ImageView>
+                        android:src="@drawable/ic_baseline_notification_important_24"></ImageView>
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
-                        android:textSize="25sp"
-                        android:text="Important"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif"
-                        android:layout_marginLeft="12dp"
                         android:layout_gravity="center_vertical"
-                        ></TextView>
+                        android:layout_marginLeft="12dp"
+                        android:fontFamily="sans-serif"
+                        android:text="Important"
+                        android:textSize="25sp"
+                        android:textStyle="bold"></TextView>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -108,10 +103,11 @@
         android:id="@+id/btn_add_task"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="25dp"
         android:layout_gravity="bottom|right"
+        android:layout_margin="25dp"
         android:backgroundTint="@color/blue_light"
         android:src="@drawable/ic_baseline_add_24"
-        ></com.google.android.material.floatingactionbutton.FloatingActionButton>
+        tools:ignore="SpeakableTextPresentCheck"></com.google.android.material.floatingactionbutton.FloatingActionButton>
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
