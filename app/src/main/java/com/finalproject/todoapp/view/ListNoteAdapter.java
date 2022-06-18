@@ -85,12 +85,11 @@ public class ListNoteAdapter extends RecyclerView.Adapter<ListNoteAdapter.ViewHo
                 }
             });
 
-            view.setOnLongClickListener(new View.OnLongClickListener() {
+            ibMenu.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public boolean onLongClick(View view) {
+                public void onClick(View view) {
                     int posClick = getAdapterPosition();
-                    onCardViewListener.onCardViewLongClick(view, posClick);
-                    return true;
+                    onCardViewListener.onCardViewMenuClick(view, posClick);
                 }
             });
         }
@@ -101,7 +100,7 @@ public class ListNoteAdapter extends RecyclerView.Adapter<ListNoteAdapter.ViewHo
     public interface OnCardViewListener {
         void onCardViewCLick(int pos);
 
-        void onCardViewLongClick(View view, int pos);
+        void onCardViewMenuClick(View view, int pos);
     }
 
 }

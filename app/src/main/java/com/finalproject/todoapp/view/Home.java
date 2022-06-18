@@ -1,5 +1,6 @@
 package com.finalproject.todoapp.view;
 
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -240,14 +241,14 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         cvMyDay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println("Change to list of my day");
+                moveToDetail("MyDay", -1);
             }
         });
 
         cvImportant.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println("Change to list of important");
+                moveToDetail("Important", -1);
             }
         });
 
@@ -267,21 +268,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@androidx.annotation.NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.btn_logout_menu:
-                if (user.getLoginTypeId() == GOOGLE) {
-                    googleSignInClient.signOut();
-                } else if (user.getLoginTypeId() == FACEBOOK) {
-                    LoginManager.getInstance().logOut();
-                }
-                logout(null);
-                return true;
-        }
-        return true;
-    }
-
+    // For move back to Main Activity
     public void logout(View view) {
         SessionManagement sessionManagement = new SessionManagement(Home.this);
         sessionManagement.removeSession();
@@ -293,6 +280,30 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         Intent intent = new Intent(Home.this, MainActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    // Home function
+    public void moveToHomeSetting() {
+        Intent intent = new Intent(Home.this, HomeSetting.class);
+        startActivityForResult(intent, 1000);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@androidx.annotation.NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.btn_logout_menu:
+                if (user.getLoginTypeId() == GOOGLE) {
+                    googleSignInClient.signOut();
+                } else if (user.getLoginTypeId() == FACEBOOK) {
+                    LoginManager.getInstance().logOut();
+                }
+                logout(null);
+                return true;
+            case R.id.btn_home_setting:
+                moveToHomeSetting();
+                return true;
+        }
+        return true;
     }
 
     public void openInputDialog(String nameActivity, int pos) {
@@ -394,11 +405,12 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
 
     @Override
     public void onCardViewCLick(int pos) {
-        System.out.println("rcv clicked!");
+        int listId = listNoteAdapter.getListId(pos);
+        moveToDetail("NewList", listId);
     }
 
     @Override
-    public void onCardViewLongClick(View view, int pos) {
+    public void onCardViewMenuClick(View view, int pos) {
         PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
         popupMenu.inflate(R.menu.home_item_long_click);
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -445,4 +457,12 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
             deleteList(viewHolder.getAdapterPosition());
         }
     };
+
+    // For task list detail
+    public void moveToDetail(String listType, int listId) {
+        Intent intent = new Intent(Home.this, Detail.class);
+        intent.putExtra("listType", listType);
+        intent.putExtra("listId", listId);
+        startActivity(intent);
+    }
 }

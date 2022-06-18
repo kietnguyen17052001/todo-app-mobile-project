@@ -3,8 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/ITDocuments/BKDocuments/LTDD/FTP/todo-app-mobile-project/app/src/main/res/drawable/gradient_bg.xml" value="0.1795" />
         <entry key="..\:/ITDocuments/BKDocuments/LTDD/FTP/todo-app-mobile-project/app/src/main/res/drawable/ic_baseline_add_24.xml" value="0.136" />
         <entry key="..\:/ITDocuments/BKDocuments/LTDD/FTP/todo-app-mobile-project/app/src/main/res/layout/activity_home.xml" value="0.2" />
+        <entry key="..\:/ITDocuments/BKDocuments/LTDD/FTP/todo-app-mobile-project/app/src/main/res/layout/activity_home_setting.xml" value="0.27447916666666666" />
+        <entry key="..\:/ITDocuments/BKDocuments/LTDD/FTP/todo-app-mobile-project/app/src/main/res/layout/activity_main.xml" value="0.27447916666666666" />
         <entry key="..\:/ITDocuments/BKDocuments/LTDD/FTP/todo-app-mobile-project/app/src/main/res/layout/input_dialog_layout.xml" value="0.27447916666666666" />
         <entry key="..\:/ITDocuments/BKDocuments/LTDD/FTP/todo-app-mobile-project/app/src/main/res/layout/layout_dialog.xml" value="0.2" />
         <entry key="..\:/ITDocuments/BKDocuments/LTDD/FTP/todo-app-mobile-project/app/src/main/res/layout/task_list_layout.xml" value="0.16927083333333334" />
