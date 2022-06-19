@@ -241,6 +241,8 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
             @Override
             public void onClick(View view) {
                 System.out.println("Change to list of my day");
+                Intent intent = new Intent(Home.this, Detail.class);
+                startActivity(intent);
             }
         });
 
