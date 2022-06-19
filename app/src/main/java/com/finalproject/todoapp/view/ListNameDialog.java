@@ -22,10 +22,12 @@ public class ListNameDialog extends AppCompatDialogFragment {
 
     private String nameActivity;
     private int pos;
+    private String listOldName;
 
-    public ListNameDialog(String nameActivity, int pos) {
+    public ListNameDialog(String nameActivity, int pos, String listOldName) {
         this.nameActivity = nameActivity;
         this.pos = pos;
+        this.listOldName = listOldName;
     }
 
     @NonNull
@@ -34,6 +36,10 @@ public class ListNameDialog extends AppCompatDialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.layout_dialog, null);
+        etNameField = view.findViewById(R.id.et_name_field);
+        if(this.nameActivity == "Rename") {
+            etNameField.setText(listOldName);
+        }
         builder.setView(view)
                 .setTitle(this.nameActivity)
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -49,7 +55,6 @@ public class ListNameDialog extends AppCompatDialogFragment {
                         listener.sendListName(nameActivity, pos, listName);
                     }
                 });
-        etNameField = view.findViewById(R.id.et_name_field);
         return builder.create();
     }
 

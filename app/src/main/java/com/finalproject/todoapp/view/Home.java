@@ -1,5 +1,6 @@
 package com.finalproject.todoapp.view;
 
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -60,7 +61,7 @@ import retrofit2.Response;
 
 public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardViewListener, ListNameDialog.ListNameDialogListener {
     private ActivityHomeBinding binding;
-//    private Button btnLogout;
+    //    private Button btnLogout;
     private CardView cvMyDay;
     private CardView cvImportant;
     private RecyclerView rcvTaskList;
@@ -240,26 +241,25 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         cvMyDay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println("Change to list of my day");
-                Intent intent = new Intent(Home.this, Detail.class);
-                startActivity(intent);
+                moveToDetail("MyDay", -1);
             }
         });
 
         cvImportant.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println("Change to list of important");
+                moveToDetail("Important", -1);
             }
         });
 
         btnAddTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openInputDialog("Create", -1);
+                openInputDialog("Create", -1, null);
                 //createNewList(userId);
             }
         });
+
     }
 
     @Override
@@ -269,21 +269,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@androidx.annotation.NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.btn_logout_menu:
-                if (user.getLoginTypeId() == GOOGLE) {
-                    googleSignInClient.signOut();
-                } else if (user.getLoginTypeId() == FACEBOOK) {
-                    LoginManager.getInstance().logOut();
-                }
-                logout(null);
-                return true;
-        }
-        return true;
-    }
-
+    // For move back to Main Activity
     public void logout(View view) {
         SessionManagement sessionManagement = new SessionManagement(Home.this);
         sessionManagement.removeSession();
@@ -297,8 +283,32 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         finish();
     }
 
-    public void openInputDialog(String nameActivity, int pos) {
-        ListNameDialog listNameDialog = new ListNameDialog(nameActivity, pos);
+    // Home function
+    public void moveToHomeSetting() {
+        Intent intent = new Intent(Home.this, HomeSetting.class);
+        startActivityForResult(intent, 1000);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@androidx.annotation.NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.btn_logout_menu:
+                if (user.getLoginTypeId() == GOOGLE) {
+                    googleSignInClient.signOut();
+                } else if (user.getLoginTypeId() == FACEBOOK) {
+                    LoginManager.getInstance().logOut();
+                }
+                logout(null);
+                return true;
+            case R.id.btn_home_setting:
+                moveToHomeSetting();
+                return true;
+        }
+        return true;
+    }
+
+    public void openInputDialog(String nameActivity, int pos, String listOldName) {
+        ListNameDialog listNameDialog = new ListNameDialog(nameActivity, pos, listOldName);
         listNameDialog.show(getSupportFragmentManager(), "Dialog");
     }
 
@@ -327,25 +337,26 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         NewList addNewList = new NewList();
         addNewList.setName(listName);
         newListApiService.create(this.userId, addNewList)
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeWith(new DisposableSingleObserver<NewList>() {
-                        @Override
-                        public void onSuccess(@NonNull NewList newList) {
-                            showListItem();
-                        }
-                        @Override
-                        public void onError(@NonNull Throwable e) {
-                            Log.e("error", e.getMessage());
-                        }
-                    });
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<NewList>() {
+                    @Override
+                    public void onSuccess(@NonNull NewList newList) {
+                        showListItem();
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        Log.e("error", e.getMessage());
+                    }
+                });
     }
 
     public void renameList(int pos, String listName) {
         NewList list = listNoteAdapter.getListByPos(pos);
-        list.setName(listName);
         System.out.println(list.getName());
-        newListApiService.update(userId, list.getId(), list)
+        list.setName(listName);
+        newListApiService.update(userId, list)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<NewList>() {
@@ -396,11 +407,13 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
 
     @Override
     public void onCardViewCLick(int pos) {
-        System.out.println("rcv clicked!");
+        int listId = listNoteAdapter.getListId(pos);
+        moveToDetail("NewList", listId);
     }
 
     @Override
-    public void onCardViewLongClick(View view, int pos) {
+    public void onCardViewMenuClick(View view, int pos) {
+        NewList list = listNoteAdapter.getListByPos(pos);
         PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
         popupMenu.inflate(R.menu.home_item_long_click);
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -408,7 +421,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.option_edit:
-                        openInputDialog("Rename", pos);
+                        openInputDialog("Rename", pos, list.getName());
                         return true;
                     case R.id.option_delete:
                         deleteList(pos);
@@ -423,10 +436,9 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
 
     @Override
     public void sendListName(String nameActivity, int pos, String listName) {
-        if(nameActivity == "Create") {
+        if (nameActivity == "Create") {
             createNewList(listName);
-        }
-        else {
+        } else {
             renameList(pos, listName);
         }
     }
@@ -447,4 +459,12 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
             deleteList(viewHolder.getAdapterPosition());
         }
     };
+
+    // For task list detail
+    public void moveToDetail(String listType, int listId) {
+        Intent intent = new Intent(Home.this, Detail.class);
+        intent.putExtra("listType", listType);
+        intent.putExtra("listId", listId);
+        startActivity(intent);
+    }
 }

@@ -13,6 +13,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TodoApp">
         <activity
+            android:name=".view.HomeSetting"
+            android:exported="false"
+            android:parentActivityName=".view.Home"/>
+        <activity
             android:name=".view.Detail"
             android:exported="false" />
         <activity

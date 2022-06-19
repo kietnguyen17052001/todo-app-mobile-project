@@ -31,8 +31,8 @@ public class NewListApiService {
         return api.create(userId, newList);
     }
 
-    public Single<NewList> update(int userId, int newListId, NewList newList){
-        return api.update(userId, newListId, newList);
+    public Single<NewList> update(int userId, NewList newList){
+        return api.update(userId, newList);
     }
 
     public Call<Void> delete(int userId, int newListId){

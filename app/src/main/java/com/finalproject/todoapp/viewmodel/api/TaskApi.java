@@ -32,11 +32,8 @@ public interface TaskApi {
     @POST("api/users/{id}/newLists/{newListId}/tasks")
     Single<Task> createNewListTask(@Path("id") int id, @Path("newListId") int newListId, @Body Task task);
 
-    @PUT("api/users/{id}/tasks/{taskId}")
-    Single<Task> update(@Path("id") int id, @Path("taskId") int taskId, @Body Task task);
-
-    @PUT("api/users/{id}/tasks/{taskId}/completed")
-    Single<Task> completed(@Path("id") int id, @Path("taskId") int taskId);
+    @PUT("api/users/{id}/tasks")
+    Single<Task> update(@Path("id") int id, @Body Task task);
 
     @DELETE("api/users/{id}/tasks/{taskId}")
     Call<Void> delete(@Path("id") int id, @Path("taskId") int taskId);

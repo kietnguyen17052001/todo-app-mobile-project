@@ -20,8 +20,8 @@ public interface NewListApi {
     @POST("api/users/{id}/newLists")
     Single<NewList> create(@Path("id") int id, @Body NewList newList);
 
-    @PUT("api/users/{id}/newLists/{newListId}")
-    Single<NewList> update(@Path("id") int id, @Path("newListId") int newListId, @Body NewList newList);
+    @PUT("api/users/{id}/newLists")
+    Single<NewList> update(@Path("id") int id, @Body NewList newList);
 
     @DELETE("api/users/{id}/newLists/{newListId}")
     Call<Void> delete(@Path("id") int id, @Path("newListId") int newListId);
