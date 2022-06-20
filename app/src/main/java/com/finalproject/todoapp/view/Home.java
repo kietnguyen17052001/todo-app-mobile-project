@@ -354,7 +354,6 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
 
     public void renameList(int pos, String listName) {
         NewList list = listNoteAdapter.getListByPos(pos);
-        System.out.println(list.getName());
         list.setName(listName);
         newListApiService.update(userId, list)
                 .subscribeOn(Schedulers.newThread())
