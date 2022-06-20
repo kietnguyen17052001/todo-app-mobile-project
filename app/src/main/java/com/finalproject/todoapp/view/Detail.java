@@ -204,7 +204,7 @@ public class Detail extends AppCompatActivity implements TaskNameAdapter.OnCardV
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-
+                        Log.e("error", e.getMessage());
                     }
                 });
     }
