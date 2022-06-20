@@ -99,7 +99,6 @@ public class ListNoteAdapter extends RecyclerView.Adapter<ListNoteAdapter.ViewHo
 
     public interface OnCardViewListener {
         void onCardViewCLick(int pos);
-
         void onCardViewMenuClick(View view, int pos);
     }
 

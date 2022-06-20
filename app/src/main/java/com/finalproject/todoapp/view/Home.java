@@ -463,7 +463,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
     public void moveToDetail(String listType, int listId) {
         Intent intent = new Intent(Home.this, Detail.class);
         intent.putExtra("listType", listType);
-        intent.putExtra("listId", listId);
+        intent.putExtra("listId", String.valueOf(listId));
         startActivity(intent);
     }
 }
