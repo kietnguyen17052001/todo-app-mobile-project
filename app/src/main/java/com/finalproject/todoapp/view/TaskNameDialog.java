@@ -36,7 +36,7 @@ public class TaskNameDialog extends AppCompatDialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.layout_dialog, null);
         etNameField = view.findViewById(R.id.et_name_field);
-        if(this.nameActivity == "Rename") {
+        if(this.nameActivity == "Edit") {
             etNameField.setText(taskOldName);
         }
         builder.setView(view)

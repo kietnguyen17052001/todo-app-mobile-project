@@ -8,7 +8,7 @@
 
 
     <TextView
-        android:id="@+id/taskText"
+        android:id="@+id/task_text"
         android:textStyle="bold"
         android:text="Tasks"
         android:layout_width="wrap_content"
@@ -18,14 +18,14 @@
         android:layout_marginTop="16dp"
         android:textSize="32sp"/>
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/tasksRecyclerView"
+        android:id="@+id/tasks_recycler_iew"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/taskText"
+        android:layout_below="@id/task_text"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:nestedScrollingEnabled="true" />
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btnAddTaskDetail"
+        android:id="@+id/btn_add_task"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

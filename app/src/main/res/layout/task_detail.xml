@@ -15,15 +15,17 @@
         android:padding="8dp">
 
         <CheckBox
-            android:id="@+id/todoCheckBox"
+            android:id="@+id/todo_check_box"
             android:layout_alignParentStart="true"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:buttonTint="@android:color/holo_green_dark"
             android:paddingStart="8dp"
-            tools:text="You are so beautiful! But is not my girl Bro" />
+            tools:text="You are so beautiful!"
+            android:textSize="20sp"/>
         <ImageView
+            android:id="@+id/iv_btn_delete"
             android:layout_alignParentEnd="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
