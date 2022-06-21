@@ -187,13 +187,18 @@ public class Detail extends AppCompatActivity implements TaskNameAdapter.OnCardV
     @Override
     public void onCardViewCLick(int pos) {
         Task task = taskNameAdapter.getTaskByPos(pos);
+        Task updateTask = new Task();
+        System.out.println(task.getId());
+        System.out.println(task.getName());
+        updateTask.setId(task.getId());
+        updateTask.setName(task.getName());
         if(task.isCompleted() == false) {
-            task.setCompleted(true);
+            updateTask.setCompleted(true);
         }
         else {
-            task.setCompleted(false);
+            updateTask.setCompleted(false);
         }
-        taskApiService.update(userId, task)
+        taskApiService.update(userId, updateTask)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<Task>() {

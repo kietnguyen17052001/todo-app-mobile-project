@@ -354,8 +354,10 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
 
     public void renameList(int pos, String listName) {
         NewList list = listNoteAdapter.getListByPos(pos);
-        list.setName(listName);
-        newListApiService.update(userId, list)
+        NewList newList = new NewList();
+        newList.setId(list.getId());
+        newList.setName(listName);
+        newListApiService.update(userId, newList)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<NewList>() {
@@ -389,7 +391,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
 
                             @Override
                             public void onFailure(Call<Void> call, Throwable t) {
-
+                                Log.e("error", t.getMessage());
                             }
                         });
             }
