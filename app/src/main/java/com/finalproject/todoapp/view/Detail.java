@@ -117,13 +117,44 @@ public class Detail extends AppCompatActivity implements TaskNameAdapter.OnCardV
                     });
         }
         if(listType.equals("Important")) {
+            taskApiService.getImportantTasks(userId)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableSingleObserver<List<Task>>() {
+                        @Override
+                        public void onSuccess(@NonNull List<Task> tasks) {
+//                            for(Task task : tasks) {
+//                                Log.d("taskname", task.getName());
+//                            }
+                            taskNameAdapter.setData(new ArrayList<>(tasks));
+                        }
 
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                            Log.e("error", e.getMessage());
+                        }
+                    });
         }
         if(listType.equals("NewList")) {
+            taskApiService.getNewListTasks(userId, Integer.parseInt(listId))
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableSingleObserver<List<Task>>() {
+                        @Override
+                        public void onSuccess(@NonNull List<Task> tasks) {
+//                            for(Task task : tasks) {
+//                                Log.d("taskname", task.getName());
+//                            }
+                            taskNameAdapter.setData(new ArrayList<>(tasks));
+                        }
 
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                            Log.e("error", e.getMessage());
+                        }
+                    });
         }
     }
-
     public void createNewTask(String taskName){
         if(listType.equals("MyDay")){
             Task newTask = new Task();
@@ -144,10 +175,40 @@ public class Detail extends AppCompatActivity implements TaskNameAdapter.OnCardV
                     });
         }
         if(listType.equals("Important")) {
+            Task newTask = new Task();
+            newTask.setName(taskName);
+            taskApiService.createImportantTask(userId, newTask)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableSingleObserver<Task>() {
+                        @Override
+                        public void onSuccess(@NonNull Task task) {
+                            showListTask();
+                        }
 
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                            Log.e("Error", e.getMessage());
+                        }
+                    });
         }
         if(listType.equals("NewList")) {
+            Task newTask = new Task();
+            newTask.setName(taskName);
+            taskApiService.createNewListTask(userId, Integer.parseInt(listId) ,newTask)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableSingleObserver<Task>() {
+                        @Override
+                        public void onSuccess(@NonNull Task task) {
+                            showListTask();
+                        }
 
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                            Log.e("Error", e.getMessage());
+                        }
+                    });
         }
     }
     public void deleteTask(int pos){
