@@ -15,19 +15,18 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 
 import com.finalproject.todoapp.R;
 
-public class ListNameDialog extends AppCompatDialogFragment {
-
+public class TaskNameDialog extends AppCompatDialogFragment {
     private EditText etNameField;
-    private ListNameDialogListener listener;
+    private TaskNameDialog.TaskNameDialogListener listener;
 
     private String nameActivity;
     private int pos;
-    private String listOldName;
+    private String taskOldName;
 
-    public ListNameDialog(String nameActivity, int pos, String listOldName) {
+    public TaskNameDialog(String nameActivity, int pos, String taskOldName) {
         this.nameActivity = nameActivity;
         this.pos = pos;
-        this.listOldName = listOldName;
+        this.taskOldName = taskOldName;
     }
 
     @NonNull
@@ -37,9 +36,9 @@ public class ListNameDialog extends AppCompatDialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.layout_dialog, null);
         etNameField = view.findViewById(R.id.et_name_field);
-        etNameField.setHint("Enter list name");
-        if(this.nameActivity == "Rename") {
-            etNameField.setText(listOldName);
+        etNameField.setHint("Enter task name");
+        if(this.nameActivity == "Edit") {
+            etNameField.setText(taskOldName);
         }
         builder.setView(view)
                 .setTitle(this.nameActivity)
@@ -53,7 +52,7 @@ public class ListNameDialog extends AppCompatDialogFragment {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String listName = etNameField.getText().toString();
-                        listener.sendListName(nameActivity, pos, listName);
+                        listener.sendTaskName(nameActivity, pos, listName);
                     }
                 });
         return builder.create();
@@ -64,14 +63,14 @@ public class ListNameDialog extends AppCompatDialogFragment {
         super.onAttach(context);
 
         try {
-            listener = (ListNameDialogListener) context;
+            listener = (TaskNameDialog.TaskNameDialogListener) context;
         } catch (ClassCastException e) {
             throw new
                     ClassCastException(context.toString() + "must implement dialog listener");
         }
     }
 
-    public interface ListNameDialogListener {
-        void sendListName(String nameActivity, int pos, String listName);
+    public interface TaskNameDialogListener {
+        void sendTaskName(String nameActivity, int pos, String listName);
     }
 }
