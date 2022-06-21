@@ -96,65 +96,7 @@ public class Detail extends AppCompatActivity implements TaskNameAdapter.OnCardV
         }
     }
 
-    public void showListTask() {
-        if(listType.equals("MyDay")) {
-            taskApiService.getMyDayTasks(userId)
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeWith(new DisposableSingleObserver<List<Task>>() {
-                        @Override
-                        public void onSuccess(@NonNull List<Task> tasks) {
-//                            for(Task task : tasks) {
-//                                Log.d("taskname", task.getName());
-//                            }
-                            taskNameAdapter.setData(new ArrayList<>(tasks));
-                        }
 
-                        @Override
-                        public void onError(@NonNull Throwable e) {
-                            Log.e("error", e.getMessage());
-                        }
-                    });
-        }
-        if(listType.equals("Important")) {
-            taskApiService.getImportantTasks(userId)
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeWith(new DisposableSingleObserver<List<Task>>() {
-                        @Override
-                        public void onSuccess(@NonNull List<Task> tasks) {
-//                            for(Task task : tasks) {
-//                                Log.d("taskname", task.getName());
-//                            }
-                            taskNameAdapter.setData(new ArrayList<>(tasks));
-                        }
-
-                        @Override
-                        public void onError(@NonNull Throwable e) {
-                            Log.e("error", e.getMessage());
-                        }
-                    });
-        }
-        if(listType.equals("NewList")) {
-            taskApiService.getNewListTasks(userId, Integer.parseInt(listId))
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeWith(new DisposableSingleObserver<List<Task>>() {
-                        @Override
-                        public void onSuccess(@NonNull List<Task> tasks) {
-//                            for(Task task : tasks) {
-//                                Log.d("taskname", task.getName());
-//                            }
-                            taskNameAdapter.setData(new ArrayList<>(tasks));
-                        }
-
-                        @Override
-                        public void onError(@NonNull Throwable e) {
-                            Log.e("error", e.getMessage());
-                        }
-                    });
-        }
-    }
     public void createNewTask(String taskName){
         if(listType.equals("MyDay")){
             Task newTask = new Task();
