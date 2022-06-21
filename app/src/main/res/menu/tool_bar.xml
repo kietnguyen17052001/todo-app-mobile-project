@@ -6,8 +6,8 @@
         android:title="@string/logout"
         />
 
-    <item
-        android:id="@+id/btn_home_setting"
-        android:title="@string/home_setting"
-        />
+<!--    <item-->
+<!--        android:id="@+id/btn_home_setting"-->
+<!--        android:title="@string/home_setting"-->
+<!--        />-->
 </menu>

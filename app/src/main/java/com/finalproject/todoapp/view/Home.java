@@ -300,9 +300,9 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
                 }
                 logout(null);
                 return true;
-            case R.id.btn_home_setting:
-                moveToHomeSetting();
-                return true;
+//            case R.id.btn_home_setting:
+//                moveToHomeSetting();
+//                return true;
         }
         return true;
     }

@@ -59,6 +59,7 @@ public class Detail extends AppCompatActivity implements TaskNameAdapter.OnCardV
         binding = ActivityDetailBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         sessionManagement = new SessionManagement(Detail.this);
         userId = sessionManagement.getSession();
         taskApiService = new TaskApiService();
@@ -81,7 +82,7 @@ public class Detail extends AppCompatActivity implements TaskNameAdapter.OnCardV
         });
     }
     public void openInputDialog(String nameActivity, int pos, String taskName) {//pos: vị trí recycle view
-        TaskNameDialog taskNameDialog = new TaskNameDialog(nameActivity, pos, null);
+        TaskNameDialog taskNameDialog = new TaskNameDialog(nameActivity, pos, taskName);
         taskNameDialog.show(getSupportFragmentManager(), "Dialog");
     }
 
@@ -90,8 +91,8 @@ public class Detail extends AppCompatActivity implements TaskNameAdapter.OnCardV
         if(nameActivity == "Create") {
             createNewTask(taskName);
         }
-        if(nameActivity == "edit"){
-//            editTask(pos);
+        if(nameActivity == "Edit"){
+            editTask(pos, taskName);
         }
     }
 
@@ -180,18 +181,36 @@ public class Detail extends AppCompatActivity implements TaskNameAdapter.OnCardV
         });
         builder.show();
     }
-    public void editTask(int pos, int idTask){
+    public void editTask(int pos, String newTaskName){
+        Task task = taskNameAdapter.getTaskByPos(pos);
+        Task updateTask = new Task();
+        updateTask.setId(task.getId());
+        updateTask.setName(newTaskName);
+        updateTask.setDescription(task.getDescription());
+        updateTask.setCompleted(task.isCompleted());
+        taskApiService.update(userId, updateTask)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<Task>() {
+                    @Override
+                    public void onSuccess(@NonNull Task task) {
+                        showListTask();
+                    }
 
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        Log.e("error", e.getMessage());
+                    }
+                });
     }
 
     @Override
     public void onCardViewCLick(int pos) {
         Task task = taskNameAdapter.getTaskByPos(pos);
         Task updateTask = new Task();
-        System.out.println(task.getId());
-        System.out.println(task.getName());
         updateTask.setId(task.getId());
         updateTask.setName(task.getName());
+        updateTask.setDescription(task.getDescription());
         if(task.isCompleted() == false) {
             updateTask.setCompleted(true);
         }
