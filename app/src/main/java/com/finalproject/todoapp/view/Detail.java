@@ -155,7 +155,62 @@ public class Detail extends AppCompatActivity implements TaskNameAdapter.OnCardV
                     });
         }
     }
+    public void createNewTask(String taskName){
+        if(listType.equals("MyDay")){
+            Task newTask = new Task();
+            newTask.setName(taskName);
+            taskApiService.createMyDayTask(userId, newTask)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableSingleObserver<Task>() {
+                        @Override
+                        public void onSuccess(@NonNull Task task) {
+                            showListTask();
+                        }
 
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                            Log.e("Error", e.getMessage());
+                        }
+                    });
+        }
+        if(listType.equals("Important")) {
+            Task newTask = new Task();
+            newTask.setName(taskName);
+            taskApiService.createImportantTask(userId, newTask)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableSingleObserver<Task>() {
+                        @Override
+                        public void onSuccess(@NonNull Task task) {
+                            showListTask();
+                        }
+
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                            Log.e("Error", e.getMessage());
+                        }
+                    });
+        }
+        if(listType.equals("NewList")) {
+            Task newTask = new Task();
+            newTask.setName(taskName);
+            taskApiService.createNewListTask(userId, Integer.parseInt(listId) ,newTask)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableSingleObserver<Task>() {
+                        @Override
+                        public void onSuccess(@NonNull Task task) {
+                            showListTask();
+                        }
+
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                            Log.e("Error", e.getMessage());
+                        }
+                    });
+        }
+    }
     public void deleteTask(int pos){
         int taskId = taskNameAdapter.getTaskId(pos);
         AlertDialog.Builder builder = new AlertDialog.Builder(Detail.this);
