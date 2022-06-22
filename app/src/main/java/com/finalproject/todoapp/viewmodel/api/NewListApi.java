@@ -8,6 +8,7 @@ import io.reactivex.rxjava3.core.Single;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -22,6 +23,9 @@ public interface NewListApi {
 
     @PUT("api/users/{id}/newLists")
     Single<NewList> update(@Path("id") int id, @Body NewList newList);
+//    @PUT("api/users/{id}/newLists")
+//    Call<NewList> update(@Path("id") int id, @Body NewList newList);
+
 
     @DELETE("api/users/{id}/newLists/{newListId}")
     Call<Void> delete(@Path("id") int id, @Path("newListId") int newListId);
