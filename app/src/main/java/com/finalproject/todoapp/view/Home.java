@@ -31,8 +31,10 @@ import com.finalproject.todoapp.R;
 import com.finalproject.todoapp.SessionManagement;
 import com.finalproject.todoapp.databinding.ActivityHomeBinding;
 import com.finalproject.todoapp.model.NewList;
+import com.finalproject.todoapp.model.Task;
 import com.finalproject.todoapp.model.User;
 import com.finalproject.todoapp.viewmodel.service.NewListApiService;
+import com.finalproject.todoapp.viewmodel.service.TaskApiService;
 import com.finalproject.todoapp.viewmodel.service.UserApiService;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -72,6 +74,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
     private GoogleSignInAccount googleSignInAccount;
     private int userId;
     private User user;
+    private Task task;
     private UserApiService userApiService;
     private NewListApiService newListApiService;
     private SessionManagement sessionManagement;
@@ -96,6 +99,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         init();
         userApiService = new UserApiService();
         user = new User();
+        task = new Task();
         sessionManagement = new SessionManagement(Home.this);
         userId = sessionManagement.getSession();
         newListApiService = new NewListApiService();
@@ -258,7 +262,6 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
                 //createNewList(userId);
             }
         });
-
     }
 
     @Override
@@ -309,9 +312,6 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
                 .subscribeWith(new DisposableSingleObserver<List<NewList>>() {
                     @Override
                     public void onSuccess(@NonNull List<NewList> newLists) {
-//                        for (NewList newList : newLists) {
-//                            Log.d("Name", newList.getId() + newList.getName());
-//                        }
                         listNoteAdapter.setData(new ArrayList<>(newLists));
                     }
 
