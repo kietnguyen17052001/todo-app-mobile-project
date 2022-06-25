@@ -39,6 +39,7 @@
             android:id="@+id/ib_menu"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:layout_marginTop="5dp"
             android:background="?android:selectableItemBackground"
             android:src="@drawable/ic_baseline_more_vert_24"
             tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck"></ImageButton>
