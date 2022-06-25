@@ -45,13 +45,16 @@ public class Detail extends AppCompatActivity implements TaskNameAdapter.OnCardV
     private TaskApiService taskApiService;
     private String listType;
     private String listId;
+    private String listName;
 
+    private TextView textNameList;
     private FloatingActionButton btnAddTaskDetail;
     private RecyclerView tasksRecyclerView;
     private TextView taskText;
 
     private TaskNameAdapter taskNameAdapter;
     public void init(){
+        textNameList = binding.taskText;
         btnAddTaskDetail = binding.btnAddTask;
         tasksRecyclerView = binding.tasksRecyclerIew;
     }
@@ -75,6 +78,8 @@ public class Detail extends AppCompatActivity implements TaskNameAdapter.OnCardV
         Intent intent = getIntent();
         listType = intent.getStringExtra("listType");
         listId = intent.getStringExtra("listId");
+        listName = intent.getStringExtra("listName");
+        textNameList.setText(listName);
         showListTask();
 
 

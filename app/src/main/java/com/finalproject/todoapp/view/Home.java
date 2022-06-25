@@ -241,14 +241,14 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         cvMyDay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                moveToDetail("MyDay", -1);
+                moveToDetail("MyDay", -1, "My day");
             }
         });
 
         cvImportant.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                moveToDetail("Important", -1);
+                moveToDetail("Important", -1, "Important");
             }
         });
 
@@ -408,8 +408,8 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
 
     @Override
     public void onCardViewCLick(int pos) {
-        int listId = listNoteAdapter.getListId(pos);
-        moveToDetail("NewList", listId);
+        NewList list = listNoteAdapter.getListByPos(pos);
+        moveToDetail("NewList", list.getId(), list.getName());
     }
 
     @Override
@@ -462,10 +462,11 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
     };
 
     // For task list detail
-    public void moveToDetail(String listType, int listId) {
+    public void moveToDetail(String listType, int listId, String listName) {
         Intent intent = new Intent(Home.this, Detail.class);
         intent.putExtra("listType", listType);
         intent.putExtra("listId", String.valueOf(listId));
+        intent.putExtra("listName", String.valueOf(listName));
         startActivity(intent);
     }
 }
