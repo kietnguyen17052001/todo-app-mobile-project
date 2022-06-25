@@ -13,12 +13,15 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 
 import com.finalproject.todoapp.R;
 import com.finalproject.todoapp.SessionManagement;
 import com.finalproject.todoapp.databinding.ActivityDetailBinding;
+import com.finalproject.todoapp.model.NewList;
 import com.finalproject.todoapp.model.Task;
 import com.finalproject.todoapp.model.User;
+import com.finalproject.todoapp.viewmodel.service.NewListApiService;
 import com.finalproject.todoapp.viewmodel.service.TaskApiService;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -45,9 +48,9 @@ public class Detail extends AppCompatActivity implements TaskNameAdapter.OnCardV
 
     private FloatingActionButton btnAddTaskDetail;
     private RecyclerView tasksRecyclerView;
+    private TextView taskText;
 
     private TaskNameAdapter taskNameAdapter;
-
     public void init(){
         btnAddTaskDetail = binding.btnAddTask;
         tasksRecyclerView = binding.tasksRecyclerIew;
@@ -73,6 +76,7 @@ public class Detail extends AppCompatActivity implements TaskNameAdapter.OnCardV
         listType = intent.getStringExtra("listType");
         listId = intent.getStringExtra("listId");
         showListTask();
+
 
         btnAddTaskDetail.setOnClickListener(new View.OnClickListener() {
             @Override
