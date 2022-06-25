@@ -103,8 +103,7 @@ public class Home extends AppCompatActivity {
                             .subscribeOn(Schedulers.newThread())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribeWith(new SingleObserver<User>() {
-                                @Override
-                                public void onSubscribe(@NonNull Disposable d) {
+                                @Override public void onSubscribe(@NonNull Disposable d) {
                                 }
 
                                 @Override
@@ -145,6 +144,7 @@ public class Home extends AppCompatActivity {
                                                 public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull User user) {
                                                     sessionManagement.saveSession(user);
                                                     showListItem(user.getId());
+                                                    Log.d("NAME", user.getDisplayName());
                                                 }
 
                                                 @Override
