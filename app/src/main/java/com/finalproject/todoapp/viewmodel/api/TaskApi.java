@@ -5,6 +5,7 @@ import com.finalproject.todoapp.model.Task;
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Single;
+import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
@@ -31,12 +32,9 @@ public interface TaskApi {
     @POST("api/users/{id}/newLists/{newListId}/tasks")
     Single<Task> createNewListTask(@Path("id") int id, @Path("newListId") int newListId, @Body Task task);
 
-    @PUT("api/users/{id}/tasks/{taskId}")
-    Single<Task> update(@Path("id") int id, @Path("taskId") int taskId, @Body Task task);
-
-    @PUT("api/users/{id}/tasks/{taskId}/completed")
-    Single<Task> completed(@Path("id") int id, @Path("taskId") int taskId);
+    @PUT("api/users/{id}/tasks")
+    Single<Task> update(@Path("id") int id, @Body Task task);
 
     @DELETE("api/users/{id}/tasks/{taskId}")
-    void delete(@Path("id") int id, @Path("taskId") int taskId);
+    Call<Void> delete(@Path("id") int id, @Path("taskId") int taskId);
 }

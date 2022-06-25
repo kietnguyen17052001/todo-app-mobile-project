@@ -7,6 +7,7 @@ import java.util.List;
 
 import hu.akarnokd.rxjava3.retrofit.RxJava3CallAdapterFactory;
 import io.reactivex.rxjava3.core.Single;
+import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -46,15 +47,11 @@ public class TaskApiService {
         return api.createNewListTask(userId, newListId, task);
     }
 
-    public Single<Task> update(int userId, int taskId, Task task) {
-        return api.update(userId, taskId, task);
+    public Single<Task> update(int userId, Task task) {
+        return api.update(userId, task);
     }
 
-    public Single<Task> completed(int userId, int taskId) {
-        return api.completed(userId, taskId);
-    }
-
-    public void delete(int userId, int taskId) {
-        api.delete(userId, taskId);
+    public Call<Void> delete(int userId, int taskId) {
+        return api.delete(userId, taskId);
     }
 }

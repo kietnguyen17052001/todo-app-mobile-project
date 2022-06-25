@@ -4,6 +4,8 @@
     <string name="facebook_app_id">437638564860553</string>
     <string name="fb_login_protocol_scheme">fb437638564860553</string>
     <string name="facebook_client_token">48049afb52760d522c8dac6e55c8a78d</string>
+    <string name="logout">Logout</string>
+    <string name="home_setting">Settings</string>
 
 
 </resources>
