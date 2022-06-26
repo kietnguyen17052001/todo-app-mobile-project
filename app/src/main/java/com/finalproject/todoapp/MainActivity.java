@@ -8,6 +8,7 @@ import android.media.Image;
 import android.os.Bundle;
 import android.view.View;
 
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     private GoogleSignInAccount googleSignInAccount;
     private SessionManagement sessionManagement;
     private int loginTypeId;
+
     // initial value
     public void init() {
         btnLoginByAccount = binding.btnLogin;
@@ -73,11 +75,6 @@ public class MainActivity extends AppCompatActivity {
         init();
         user = new User();
         userApiService = new UserApiService();
-
-//        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
-//        if(acct != null){
-//            moveToHome();
-//        }
 
         // Login by normal account
         btnLoginByAccount.setOnClickListener(new View.OnClickListener() {
@@ -122,6 +119,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+        if (acct != null) {
+            loginTypeId = GOOGLE;
+            moveToHome();
+            finish();
+        }
         googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
@@ -134,6 +137,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         callbackManager = CallbackManager.Factory.create();
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if (accessToken != null && accessToken.isExpired() == false) {
+            loginTypeId = FACEBOOK;
+            moveToHome();
+            finish();
+        }
         LoginManager.getInstance().registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
                     @Override

@@ -73,7 +73,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
     private GoogleSignInOptions googleSignInOptions;
     private GoogleSignInClient googleSignInClient;
     private GoogleSignInAccount googleSignInAccount;
-    private int userId;
+    private int userId = -2;
     private User user;
     private UserApiService userApiService;
     private NewListApiService newListApiService;
@@ -107,6 +107,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         rcvTaskList.setAdapter(listNoteAdapter);
         rcvTaskList.setLayoutManager(new LinearLayoutManager(this));
         loginType = getIntent().getIntExtra("loginTypeId", 0);
+        Log.d("TYPELOGIN", loginType + "");
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(rcvTaskList);
         Log.d("userId", String.valueOf(userId));
         if (userId != -1) {
@@ -126,6 +127,9 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
 //                                googleSignInClient = GoogleSignIn.getClient(Home.this, googleSignInOptions);
 //                            }
                             // main
+                            if (userResponse.getLoginTypeId() == 4) {
+                                loginType = FACEBOOK;
+                            }
                             showListItem();
                         }
 
@@ -134,100 +138,103 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
 
                         }
                     });
-        } else {
+        }
 
-            if (loginType == GOOGLE) {
-                googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
-                googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
-                googleSignInAccount = GoogleSignIn.getLastSignedInAccount(this);
-                if (googleSignInAccount != null) {
-                    userApiService.getUserByEmail(googleSignInAccount.getEmail())
-                            .subscribeOn(Schedulers.newThread())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribeWith(new SingleObserver<User>() {
-                                @Override public void onSubscribe(@NonNull Disposable d) {
-                                }
-
-                                @Override
-                                public void onSuccess(@NonNull User userResponse) {
-                                    sessionManagement.saveSession(userResponse);
-                                    userId = userResponse.getId();
-                                    // main
-                                    showListItem();
-
-                                }
-
-                                @Override
-                                public void onError(@NonNull Throwable e) {
-                                }
-                            });
-                }
-            } else {
-                AccessToken accessToken = AccessToken.getCurrentAccessToken();
-                GraphRequest request = GraphRequest.newMeRequest(
-                        accessToken,
-                        new GraphRequest.GraphJSONObjectCallback() {
+        if (loginType == GOOGLE) {
+            Log.d("GOOGLE", loginType + "");
+            googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
+            googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
+            googleSignInAccount = GoogleSignIn.getLastSignedInAccount(this);
+            if (googleSignInAccount != null) {
+                userApiService.getUserByEmail(googleSignInAccount.getEmail())
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeWith(new SingleObserver<User>() {
                             @Override
-                            public void onCompleted(
-                                    JSONObject object,
-                                    GraphResponse response) {
-                                // Application code
-                                try {
-                                    user.setUsername(object.getString("id"));
-                                    user.setDisplayName(object.getString("name"));
-                                    userApiService.create(user, FACEBOOK)
-                                            .subscribeOn(Schedulers.newThread())
-                                            .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribeWith(new SingleObserver<User>() {
-                                                @Override
-                                                public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                            public void onSubscribe(@NonNull Disposable d) {
+                            }
 
-                                                }
+                            @Override
+                            public void onSuccess(@NonNull User userResponse) {
+                                sessionManagement.saveSession(userResponse);
+                                userId = userResponse.getId();
+                                // main
+                                showListItem();
 
-                                                @Override
-                                                public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull User user) {
-                                                    sessionManagement.saveSession(user);
-                                                    userId = user.getId();
-                                                    showListItem();
-                                                }
+                            }
 
-                                                @Override
-                                                public void onError(@NonNull Throwable e) {
-                                                    userApiService.getUserByUid(user.getUsername())
-                                                            .subscribeOn(Schedulers.newThread())
-                                                            .observeOn(AndroidSchedulers.mainThread())
-                                                            .subscribeWith(new SingleObserver<User>() {
-                                                                @Override
-                                                                public void onSubscribe(@NonNull Disposable d) {
-
-                                                                }
-
-                                                                @Override
-                                                                public void onSuccess(@NonNull User user) {
-                                                                    sessionManagement.saveSession(user);
-                                                                    userId = user.getId();
-                                                                    showListItem();
-                                                                }
-
-                                                                @Override
-                                                                public void onError(@NonNull Throwable e) {
-
-                                                                }
-                                                            });
-                                                }
-                                            });
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
+                            @Override
+                            public void onError(@NonNull Throwable e) {
                             }
                         });
-                Bundle parameters = new Bundle();
-                parameters.putString("fields", "id,name,link, picture.type(large)");
-                request.setParameters(parameters);
-                request.executeAsync();
             }
+        } else if (loginType == FACEBOOK) {
+            Log.d("FACEBOOK", loginType + "");
+            AccessToken accessToken = AccessToken.getCurrentAccessToken();
+            GraphRequest request = GraphRequest.newMeRequest(
+                    accessToken,
+                    new GraphRequest.GraphJSONObjectCallback() {
+                        @Override
+                        public void onCompleted(
+                                JSONObject object,
+                                GraphResponse response) {
+                            // Application code
+                            try {
+                                user.setUsername(object.getString("id"));
+                                user.setDisplayName(object.getString("name"));
+                                userApiService.create(user, FACEBOOK)
+                                        .subscribeOn(Schedulers.newThread())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribeWith(new SingleObserver<User>() {
+                                            @Override
+                                            public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
 
+                                            }
+
+                                            @Override
+                                            public void onSuccess(@io.reactivex.rxjava3.annotations.NonNull User user) {
+                                                sessionManagement.saveSession(user);
+                                                userId = user.getId();
+                                                showListItem();
+                                            }
+
+                                            @Override
+                                            public void onError(@NonNull Throwable e) {
+                                                userApiService.getUserByUid(user.getUsername())
+                                                        .subscribeOn(Schedulers.newThread())
+                                                        .observeOn(AndroidSchedulers.mainThread())
+                                                        .subscribeWith(new SingleObserver<User>() {
+                                                            @Override
+                                                            public void onSubscribe(@NonNull Disposable d) {
+
+                                                            }
+
+                                                            @Override
+                                                            public void onSuccess(@NonNull User user) {
+                                                                sessionManagement.saveSession(user);
+                                                                userId = user.getId();
+                                                                Log.d("IDFB", userId + "");
+                                                                showListItem();
+                                                            }
+
+                                                            @Override
+                                                            public void onError(@NonNull Throwable e) {
+
+                                                            }
+                                                        });
+                                            }
+                                        });
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+            Bundle parameters = new Bundle();
+            parameters.putString("fields", "id,name,link, picture.type(large)");
+            request.setParameters(parameters);
+            request.executeAsync();
         }
+
 
 //        btnLogout.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -297,8 +304,10 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         switch (item.getItemId()) {
             case R.id.btn_logout_menu:
                 if (loginType == GOOGLE) {
+                    Log.d("GOOGLE_OUT", loginType + "");
                     googleSignInClient.signOut();
                 } else if (loginType == FACEBOOK) {
+                    Log.d("FACEBOOK_OUT", loginType + "");
                     LoginManager.getInstance().logOut();
                 }
                 logout(null);
@@ -452,17 +461,17 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
                     ItemTouchHelper.UP | ItemTouchHelper.DOWN,
                     ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
 
-        @Override
-        public boolean onMove(@androidx.annotation.NonNull RecyclerView recyclerView, @androidx.annotation.NonNull RecyclerView.ViewHolder viewHolder, @androidx.annotation.NonNull RecyclerView.ViewHolder target) {
+                @Override
+                public boolean onMove(@androidx.annotation.NonNull RecyclerView recyclerView, @androidx.annotation.NonNull RecyclerView.ViewHolder viewHolder, @androidx.annotation.NonNull RecyclerView.ViewHolder target) {
 //            listNoteAdapter.onMoveItem(viewHolder.getAdapterPosition(), target.getAdapterPosition());
-            return true;
-        }
+                    return true;
+                }
 
-        @Override
-        public void onSwiped(@androidx.annotation.NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-            deleteList(viewHolder.getAdapterPosition());
-        }
-    };
+                @Override
+                public void onSwiped(@androidx.annotation.NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                    deleteList(viewHolder.getAdapterPosition());
+                }
+            };
 
     // For task list detail
     public void moveToDetail(String listType, int listId, String listName) {
