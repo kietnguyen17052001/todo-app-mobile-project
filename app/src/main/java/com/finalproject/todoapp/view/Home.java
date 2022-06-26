@@ -39,6 +39,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONException;
@@ -78,6 +80,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
     private SessionManagement sessionManagement;
 
     private ListNoteAdapter listNoteAdapter;
+    private int loginType;
 
     // initial value
     public void init() {
@@ -103,6 +106,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
         listNoteAdapter = new ListNoteAdapter(new ArrayList<>(), this);
         rcvTaskList.setAdapter(listNoteAdapter);
         rcvTaskList.setLayoutManager(new LinearLayoutManager(this));
+        loginType = getIntent().getIntExtra("loginTypeId", 0);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(rcvTaskList);
         Log.d("userId", String.valueOf(userId));
         if (userId != -1) {
@@ -117,10 +121,10 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
 
                         @Override
                         public void onSuccess(@NonNull User userResponse) {
-                            if (userResponse.getLoginTypeId() == GOOGLE) {
-                                googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
-                                googleSignInClient = GoogleSignIn.getClient(getApplicationContext(), googleSignInOptions);
-                            }
+//                            if (userResponse.getLoginTypeId() == GOOGLE) {
+//                                googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
+//                                googleSignInClient = GoogleSignIn.getClient(Home.this, googleSignInOptions);
+//                            }
                             // main
                             showListItem();
                         }
@@ -131,7 +135,7 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
                         }
                     });
         } else {
-            int loginType = getIntent().getIntExtra("loginTypeId", 0);
+
             if (loginType == GOOGLE) {
                 googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
                 googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
@@ -292,9 +296,9 @@ public class Home extends AppCompatActivity implements ListNoteAdapter.OnCardVie
     public boolean onOptionsItemSelected(@androidx.annotation.NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.btn_logout_menu:
-                if (user.getLoginTypeId() == GOOGLE) {
+                if (loginType == GOOGLE) {
                     googleSignInClient.signOut();
-                } else if (user.getLoginTypeId() == FACEBOOK) {
+                } else if (loginType == FACEBOOK) {
                     LoginManager.getInstance().logOut();
                 }
                 logout(null);

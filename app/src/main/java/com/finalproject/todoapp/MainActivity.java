@@ -74,6 +74,11 @@ public class MainActivity extends AppCompatActivity {
         user = new User();
         userApiService = new UserApiService();
 
+//        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+//        if(acct != null){
+//            moveToHome();
+//        }
+
         // Login by normal account
         btnLoginByAccount.setOnClickListener(new View.OnClickListener() {
             @Override
